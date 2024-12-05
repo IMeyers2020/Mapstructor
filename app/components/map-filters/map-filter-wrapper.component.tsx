@@ -8,7 +8,7 @@ import { MapItem, MapZoomProps } from "@/app/models/maps/map.model";
 import ZoomLabelButton from "../forms/buttons/zoom-label-button.component";
 import ButtonLinkForm from "../forms/ButtonLinkForm";
 import ButtonLinkButton from "../forms/buttons/button-link-button.component";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ButtonLink } from "@/app/models/button-link.model";
 
 export type MapFilterWrapperProps = {
@@ -20,7 +20,7 @@ export type MapFilterWrapperProps = {
   afterMapCallback: (map: MapItem) => void;
   zoomToWorld: () => void;
   mapZoomCallback: (zoomProps: MapZoomProps) => void;
-  authToken?: string
+  authToken: string
 };
 
 const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {

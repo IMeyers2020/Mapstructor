@@ -17,7 +17,7 @@ type SectionLayerGroupItemProps = {
     fetchLayerDataCallback: (id: string) => void,
     afterSubmit: () => void,
     upperCheckBox: boolean,
-    authToken?: string
+    authToken: string
 }
 
 const SectionLayerGroupItemComponent = (props: SectionLayerGroupItemProps) => {

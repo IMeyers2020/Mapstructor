@@ -197,7 +197,7 @@ export default function Home() {
   }
 
   function createHandleEvent(beforeMap: MutableRefObject<mapboxgl.Map | null>, afterMap: MutableRefObject<mapboxgl.Map | null>, layerConfig: PrismaLayer) {
-    let hoveredId: string | number | null = null;
+    let hoveredId: string | number | undefined = undefined;
     let hoverStyleString: string;
     var popUpType: PopupType;
     var clickVisible: boolean = popUpVisible;
@@ -359,15 +359,15 @@ export default function Home() {
           hoverStyleString += "</div>";
           if (e.features?.length) {
             if (hoveredId !== null) {
-              beforeMap.current!.setFeatureState({ source: layerConfig.id, sourceLayer: layerConfig.sourceLayer, id: hoveredId }, { hover: false });
-              afterMap.current!.setFeatureState({ source: layerConfig.id, sourceLayer: layerConfig.sourceLayer, id: hoveredId }, { hover: false });
+              beforeMap.current!.setFeatureState({ source: layerConfig.id, sourceLayer: layerConfig.sourceLayer, id: hoveredId } as any, { hover: false });
+              afterMap.current!.setFeatureState({ source: layerConfig.id, sourceLayer: layerConfig.sourceLayer, id: hoveredId } as any, { hover: false });
             }
     
             if (e.features[0].id !== undefined) {
               hoveredId = e.features[0].id;
-              beforeMap.current!.setFeatureState({ source: layerConfig.id, sourceLayer: layerConfig.sourceLayer, id: hoveredId }, { hover: true });
+              beforeMap.current!.setFeatureState({ source: layerConfig.id, sourceLayer: layerConfig.sourceLayer, id: hoveredId } as any, { hover: true });
               beforeMap.current!.getCanvas().style.cursor = "pointer";
-              afterMap.current!.setFeatureState({ source: layerConfig.id, sourceLayer: layerConfig.sourceLayer, id: hoveredId }, { hover: true });
+              afterMap.current!.setFeatureState({ source: layerConfig.id, sourceLayer: layerConfig.sourceLayer, id: hoveredId } as any, { hover: true });
               afterMap.current!.getCanvas().style.cursor = "pointer";
             }
             beforeHoverPopup
@@ -387,7 +387,7 @@ export default function Home() {
             if (hoveredId) {
               beforeMap.current!.setFeatureState({ source: layerConfig.id, sourceLayer: layerConfig.sourceLayer, id: hoveredId  }, { hover: false });
               afterMap.current!.setFeatureState({ source: layerConfig.id, sourceLayer: layerConfig.sourceLayer, id: hoveredId  }, { hover: false });
-              hoveredId = null;
+              hoveredId = undefined;
             }
             beforeHoverPopup.remove();
             afterHoverPopup.remove();
@@ -503,21 +503,21 @@ export default function Home() {
         if(!!parsed && !!parsed.LayerSections && parsed.LayerSections.length > 0) {
           let sections: PrismaLayerSection[] = parsed.LayerSections;
 
-          let returnSectionLayers: SectionLayer[] = sections.map((x: PrismaLayerSection, idx_x) => {
+          let returnSectionLayers: SectionLayer[] = sections.map((x, idx_x) => {
             let layer: SectionLayer = {
               id: x.id,
               label: x.name,
-              groups: x.layerGroups.map((y: PrismaLayerGroup, idx_y: number) => {
+              groups: (x as any).layerGroups.map((y: PrismaLayerGroup, idx_y: number) => {
                 let mappedGroup: SectionLayerGroup = {
                   id: y.id,
                   label: y.name,
-                  iconColor: y.iconColor ?? IconColors.YELLOW,
+                  iconColor: (y as any).iconColor ?? IconColors.YELLOW,
                   iconType: FontAwesomeLayerIcons.PLUS_SQUARE,
                   isSolid: true,
                   center: [+(y.longitude ?? 0), +(y.latitude ?? 0)],
                   bearing: y.bearing ?? 0,
                   zoom: y.zoom ?? 0,
-                  items: y.layers?.map((z: PrismaLayer, z_idx: number) => {
+                  items: (y as any).layers?.map((z: PrismaLayer, z_idx: number) => {
                     setCurrLayers(currLayers => [...currLayers, z]);
                     let newDBMap: SectionLayerItem = {
                       id: z.id,
@@ -561,7 +561,7 @@ export default function Home() {
                 name: grp.groupName,
                 label: grp.label,
                 groupId: grp.groupId,
-                maps: grp.maps.map((x: PrismaMap) => {
+                maps: (grp as any).maps.map((x: PrismaMap) => {
                   let newDBMap: MapItem = {
                     mapId: x.mapId,
                     groupId: grp.groupId,
@@ -573,7 +573,7 @@ export default function Home() {
                   }
                   return newDBMap
                 }),
-                mapfilteritems: grp.mapfilteritems.map((x: PrismaMapFilterItem) => {
+                mapfilteritems: (grp as any).mapfilteritems.map((x: PrismaMapFilterItem) => {
                   let filterItem: MapFilterItem = {
                     id: x.id,
                     groupId: grp.groupId,

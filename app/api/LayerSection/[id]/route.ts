@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request, context: any) {
     const {params} = context; 
     const prisma = new PrismaClient();
-    const layerSection:LayerSection = await prisma.layerSection.findFirst({
+    const layerSection = await prisma.layerSection.findFirst({
         where: {
             id: params.id
         },

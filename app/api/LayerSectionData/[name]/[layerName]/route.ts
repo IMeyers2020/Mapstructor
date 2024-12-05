@@ -12,7 +12,7 @@ export async function POST(request: Request, context: any) {
 
     const {params} = context
     const prisma = new PrismaClient();
-    const s = await prisma.layerSectionData.update({
+    const s = await (prisma as any).layerSectionData.update({
         where: {
             name: params.name
         },

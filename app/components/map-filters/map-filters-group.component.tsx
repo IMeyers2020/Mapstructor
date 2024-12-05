@@ -16,7 +16,7 @@ type MapFiltersGroupComponentProps = {
     mapZoomCallback: (zoomProps: MapZoomProps) => void
     beforeOpen: () => void,
     afterClose: () => void,
-    authToken?: string
+    authToken: string
 }
 
 const MapFiltersGroupComponent = (props: MapFiltersGroupComponentProps) => {

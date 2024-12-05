@@ -40,7 +40,7 @@ const SliderPopUp = (props: GenericPopUpProps) => {
               let doc: Document = parser.parseFromString(modifiedHtmlString, 'text/html');
               let elements: NodeListOf<Element> = doc.querySelectorAll('.field.field--name-title.field--type-string.field--label-hidden');
               elements.forEach((element: Element) => {
-                let text: string = element.textContent || element.innerText;
+                let text: string = element.textContent ?? '';
 
                 if (text) {
                   let newText: string = text.substring(text.lastIndexOf('_') + 1);

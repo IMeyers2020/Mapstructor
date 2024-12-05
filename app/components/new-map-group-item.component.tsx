@@ -6,7 +6,7 @@ import { FontAwesomeLayerIcons } from "../models/font-awesome.model";
 import { getFontawesomeIcon } from "../helpers/font-awesome.helper";
 import POSTMapForm from "./forms/MapForm";
 type MapFormButtonProps = {
-    authToken?: string
+    authToken: string
     groupId: string,
     groupName: string,
     beforeOpen: () => void,

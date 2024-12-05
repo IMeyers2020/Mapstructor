@@ -38,6 +38,7 @@
     "react-transition-group": "^4.4.5"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/mapbox-gl": "^3.4.0",
     "@types/node": "^20",
     "@types/react": "^18.3.5",

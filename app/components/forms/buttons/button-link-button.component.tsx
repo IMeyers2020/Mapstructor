@@ -5,7 +5,7 @@ import { FontAwesomeLayerIcons } from "@/app/models/font-awesome.model";
 import { faTrash } from "@fortawesome/free-solid-svg-icons"; // Import the trash can icon
 
 type ButtonLinkButtonProps = {
-  authToken?: string,
+  authToken: string,
   buttonLink: ButtonLink;
   onDelete: (id: string) => void;
 };

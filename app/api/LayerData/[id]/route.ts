@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request, context: any) {
     const {params} = context;
     const prisma = new PrismaClient();
-    const layerData:LayerData = await prisma.layerData.findFirst({
+    const layerData = await prisma.layerData.findFirst({
         where:{
             id: params.id
         }
@@ -17,7 +17,7 @@ export async function GET(request: Request, context: any) {
 
 export async function PUT(request: Request, context: any) {
     const { params } = context;
-    const Layerr: LayerData = await request.json()
+    const Layerr = await request.json()
     const prisma = new PrismaClient();
     const layer = await prisma.layerData.update({
         where: {

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
     const prisma = new PrismaClient();
-    const zoomLabel:ZoomLabel = await prisma.zoomLabel.findMany()
+    const zoomLabel = await prisma.zoomLabel.findMany()
 
     return NextResponse.json({
         zoomLabel
@@ -12,7 +12,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
 const prisma = new PrismaClient();
-const zoomLabel:ZoomLabel = await request.json()
+const zoomLabel = await request.json()
 try {
 const l = await prisma.zoomLabel.create({
     data: {

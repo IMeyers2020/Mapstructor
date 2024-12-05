@@ -59,7 +59,7 @@ const NewLayerGroupForm = (props: NewLayerGroupFormProps) => {
           
         onSubmit: async (values) => {
             if(values.name?.length > 0) {
-                const resultingLayerGroup: LayerGroup = {
+                const resultingLayerGroup = {
                     name: values.name,
                     layerSectionId: props.sectionLayerId,
                     longitude: values.longitude,

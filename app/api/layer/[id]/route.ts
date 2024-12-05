@@ -5,7 +5,7 @@ import { Auth } from "../../auth/auth";
 export async function GET(request: Request, context: any) {
     const { params } = context;
     const prisma = new PrismaClient();
-    const layer = await prisma.layer.findFirst({
+    const layer = await (prisma as any).layer.findFirst({
         where: {
             id: params.id
         }
@@ -26,12 +26,12 @@ export async function DELETE(context: any) {
     }
     const {params} = context;
     const prisma = new PrismaClient();
-    const layer = await prisma.layer.findFirst({
+    const layer = await (prisma as any).layer.findFirst({
         where: {
             id: params.id
         }
     })
-    const deleteLayer = await prisma.layer.update({
+    const deleteLayer = await (prisma as any).layer.update({
         where: {
             id: params.id
         },
@@ -46,9 +46,9 @@ export async function DELETE(context: any) {
 
 export async function PUT(request: Request, context: any) {
     const { params } = context;
-    const Layer:Layer = await request.json()
+    const Layer = await request.json()
     const prisma = new PrismaClient();
-    const layer = await prisma.layer.update({
+    const layer = await (prisma as any).layer.update({
         where: {
             id: params.id
         },

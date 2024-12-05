@@ -25,9 +25,8 @@ export async function POST(request: Request) { // create
         }, {status: 401});
     }
   try {
-      const group: MapFilterGroup = await request.json(); // parse the JSON
+      const group = await request.json(); // parse the JSON
 
-      console.log(group);
       const existingGroup = await prisma.mapFilterGroup.findFirst({ //check if group exsit 
           where: {
             groupId: group.groupId,
@@ -49,7 +48,7 @@ export async function POST(request: Request) { // create
             label: group.label,
             groupId: group.groupId,
             maps: {
-                create: group.maps?.map(m => ({ //creates the maps
+                create: group.maps?.map((m: any) => ({ //creates the maps
                     mapId: m.mapId,
                     longitude: m.longitude,
                     latitude: m.latitude,
@@ -61,7 +60,7 @@ export async function POST(request: Request) { // create
                 })) || [],
             },
             mapfilteritems: {
-                create: group.mapfilteritems?.map(item => ({ //creates the items
+                create: group.mapfilteritems?.map((item: any) => ({ //creates the items
                     itemName: item.itemName,
                     label: item.label,
                     itemId: item.itemId,
@@ -83,7 +82,7 @@ export async function POST(request: Request) { // create
       console.error("Error creating map:", error); // log to server
       return NextResponse.json({ // send 500 (Internal Server Error) and what the error is to frontend
           message: "Failed to create map",
-          error: error.message,
+          error: error,
       }, { status: 500 });
   }
 }

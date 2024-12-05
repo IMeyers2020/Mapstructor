@@ -9,7 +9,7 @@ import ZoomLabelForm from '../ZoomLabelForm';
 type ZoomLabelButtonProps = {
     beforeOpen: () => void,
     afterClose: () => void,
-    authToken?: string
+    authToken: string
 }
 
 const ZoomLabelButton = (props: ZoomLabelButtonProps) => {
@@ -47,7 +47,7 @@ const ZoomLabelButton = (props: ZoomLabelButtonProps) => {
                 onRequestClose={closeWindow}
                 contentLabel='New Map'
             >
-                <ZoomLabelForm></ZoomLabelForm>
+                <ZoomLabelForm authToken={props.authToken}></ZoomLabelForm>
             </Modal>
         </>
     )

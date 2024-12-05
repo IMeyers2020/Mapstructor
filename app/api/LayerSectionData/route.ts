@@ -1,11 +1,10 @@
 import { PrismaClient} from "@prisma/client";
 import { NextResponse } from "next/server";
-import { LayerSectionData } from "@prisma/client";
 import { Auth } from "../auth/auth";
 
 export async function GET() {
     const prisma = new PrismaClient();
-    const sections = (await prisma.layerSectionData.findMany({
+    const sections = (await (prisma as any).layerSectionData.findMany({
         include: {layers: true}
     }))
 
@@ -22,10 +21,10 @@ export async function POST(request: Request) {
             error: "Auth Token Invaild",
         }, {status: 401});
     }
-    const LayerSectionData:LayerSectionData = await request.json()
+    const LayerSectionData = await request.json()
     const prisma = new PrismaClient();
     try {
-        await prisma.layerSectionData.create({
+        await (prisma as any).layerSectionData.create({
             data: {
                 name:LayerSectionData.name,
                 sectionName:LayerSectionData.sectionName,
@@ -50,10 +49,10 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-    const LayerSectionData:LayerSectionData = await request.json()
+    const LayerSectionData = await request.json()
     const prisma = new PrismaClient();
     try {
-        await prisma.layerSectionData.update({
+        await (prisma as any).layerSectionData.update({
             where: {
                 id: LayerSectionData.id
             },

@@ -4,7 +4,7 @@ import { CSSProperties } from 'react';
 import { MapFilterGroup as PrismaMapFilterGroup } from '@prisma/client';
 
 type POSTMapFormProps = {
-  authToken?: string
+  authToken: string
 }
 const POSTMapForm = (props: POSTMapFormProps) => {
   const [responseMessage, setResponseMessage] = useState('');
