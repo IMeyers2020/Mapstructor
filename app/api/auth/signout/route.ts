@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import {addToBlackList} from '../blacklist/blacklist';
 import { Auth } from "../auth";
-
-const JWT_SECRET = process.env.JWT_SECRET;
+import { getCookie } from 'cookies-next';
 
 export async function POST(request:Request) {
 
   const authHeader = request.headers.get('authorization');
+
+  const JWT_SECRET = getCookie('authToken');
 
   Auth(request);
     

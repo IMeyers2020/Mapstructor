@@ -3,15 +3,14 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs"; 
 import jwt from "jsonwebtoken";
 import { User } from "@prisma/client";
-
-const JWT_SECRET = process.env.JWT_SECRET;
+import { getCookie } from "cookies-next";
 
 // Login
 export async function POST(request: Request) {
     
     const prisma = new PrismaClient();
 
-    const user: User = await request.json();
+    const user = await request.json();
 
     // Input validation
     if (!user.username || !user.password) {
@@ -43,6 +42,7 @@ export async function POST(request: Request) {
             );
         }
 
+        const JWT_SECRET = user.encrypted;
         const token = jwt.sign(
             { userId: exsituser.id, username: exsituser.username },
             JWT_SECRET,

@@ -480,7 +480,7 @@ export default function Home() {
 
   const fetchButtonLinks = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/ButtonLink");
+      const response = await fetch("/api/ButtonLink");
       const data = await response.json();
       if (data && data.buttonLinks) {
         setButtonLinks(data.buttonLinks);
