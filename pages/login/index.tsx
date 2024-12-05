@@ -14,9 +14,6 @@ let time : number = 6.84e+6; //1 hour and 50 mins
 
 const Home = () => {
 
-  const [currToken, setCurrToken] = useState<string>('');
-  const [seconds, setSeconds] = useState(0);
-
   const buttonStyling: CSSProperties = {
     float: 'left',
     color: 'black',
@@ -58,7 +55,6 @@ const Home = () => {
   }
 
   const setAuth = (token: string) => {
-    setCurrToken(token);
     setCookie('authToken', token, { maxAge: 60 * 60 * 2 }); // Cookie lasts for 2 hours (MATCH BACKEND)
   }
 
