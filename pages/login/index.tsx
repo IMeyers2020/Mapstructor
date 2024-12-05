@@ -1,16 +1,10 @@
 import { useFormik } from 'formik';
-import { CSSProperties, useEffect, useState } from 'react';
+import { CSSProperties } from 'react';
 import '../../app/globals.css';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { getCookie, setCookie } from 'cookies-next';
-
-const crypto = require('crypto');
-
-process.env.KEY = crypto.randomBytes(32); //init the encrytion KEY and IV once
-process.env.IV = crypto.randomBytes(16); //XXX - might be a bug where it resets the key and IV each time login in pulled up
-
-let time : number = 6.84e+6; //1 hour and 50 mins
+import { setCookie } from 'cookies-next';
+import * as crypto from 'crypto';
 
 const Home = () => {
 
@@ -69,7 +63,7 @@ const Home = () => {
     onSubmit: async (values) => {
       try {
 
-        let encrypted = encrypt(values.password);
+        const encrypted = encrypt(values.password);
 
         process.env.USERNAME =  values.username;
         process.env.PASSWORD = encrypted;
@@ -100,11 +94,10 @@ const Home = () => {
   });
 
   const encrypt = (password : string) => {
-    let algorithm = process.env.ALGORITHM as string;
-    let key = process.env.KEY as string;
-    let iv = process.env.IV as string;
+    const key = crypto.randomBytes(32);
+    const iv = crypto.randomBytes(16);
 
-    let cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
     let encrypted = cipher.update(password, 'utf8', 'hex');
     encrypted += cipher.final('hex');
 
