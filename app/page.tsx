@@ -429,7 +429,7 @@ export default function Home() {
   }
 
   const getZoomLayers = () => {
-    fetch('http://localhost:3000/api/ZoomLabel', {
+    fetch('/api/ZoomLabel', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -493,7 +493,7 @@ export default function Home() {
 
   const getLayerSections = () => {
     setCurrLayers([]);
-    fetch('http://localhost:3000/api/LayerSection', {
+    fetch('/api/LayerSection', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -545,7 +545,7 @@ export default function Home() {
   }
 
   const getMaps = () => {
-    fetch('http://localhost:3000/api/map', {
+    fetch('/api/map', {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json',

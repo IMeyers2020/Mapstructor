@@ -60,7 +60,7 @@ const ZoomLabelForm = (props: ZoomLabelFormProps) => {
     const [isLoading, setIsLoading] = useState<boolean>();
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/ZoomLabel', {
+        fetch('/api/ZoomLabel', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ const ZoomLabelForm = (props: ZoomLabelFormProps) => {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            await fetch('http://localhost:3000/api/ZoomLabel')
+            await fetch('/api/ZoomLabel')
             .then((response) => {
             response.json()?.then(parsed => {
                 setExistingLabels(parsed.zoomLabel);
@@ -97,7 +97,7 @@ const ZoomLabelForm = (props: ZoomLabelFormProps) => {
 
     const deleteLabel = async (label: PrismaZoomLabel) => {
         try {
-            await fetch('http://localhost:3000/api/ZoomLabel/' + label.id, {
+            await fetch('/api/ZoomLabel/' + label.id, {
                 method: 'DELETE',
                 headers: {
                     'authorization': props.authToken,
@@ -219,7 +219,7 @@ const ZoomLabelForm = (props: ZoomLabelFormProps) => {
 
                 if(selectedLabel == null) {
                     try {
-                        await fetch('http://localhost:3000/api/ZoomLabel', {
+                        await fetch('/api/ZoomLabel', {
                             method: 'POST',
                             headers: {
                                 'authorization': props.authToken,
@@ -241,7 +241,7 @@ const ZoomLabelForm = (props: ZoomLabelFormProps) => {
                     }
                 } else {
                     try {
-                        await fetch('http://localhost:3000/api/ZoomLabel/' + selectedLabel.id, {
+                        await fetch('/api/ZoomLabel/' + selectedLabel.id, {
                             method: 'PUT',
                             headers: {
                                 'authorization': props.authToken,

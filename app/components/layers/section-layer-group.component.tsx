@@ -53,7 +53,7 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
     const fetchLayerData = async (id: string) => {
         setIsLoading(true);
         try {
-            await fetch('http://localhost:3000/api/LayerData/' + id)
+            await fetch('/api/LayerData/' + id)
             .then((response) => {
             response.json()?.then(parsed => {
                 setLayer(parsed.layerData);
@@ -70,7 +70,7 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
     const UpLayerGroup = async (id: string) => {
         setIsLoading(true);
         try {
-            await fetch('http://localhost:3000/api/LayerGroup/Rearrange/Up/' + id, {
+            await fetch('/api/LayerGroup/Rearrange/Up/' + id, {
                 method: 'PUT'
             });
         }
@@ -85,7 +85,7 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
     const DownLayerGroup = async (id: string) => {
         setIsLoading(true);
         try {
-            await fetch('http://localhost:3000/api/LayerGroup/Rearrange/Down/' + id, {
+            await fetch('/api/LayerGroup/Rearrange/Down/' + id, {
                 method: 'PUT'
             });
         }

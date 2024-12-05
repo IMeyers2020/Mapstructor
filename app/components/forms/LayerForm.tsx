@@ -74,7 +74,7 @@ export default function LayerForm(props: LayerFormProps) {
         {
           try
           {
-            await fetch('http://localhost:3000/api/LayerData/' + props.layerConfig.id, {
+            await fetch('/api/LayerData/' + props.layerConfig.id, {
               method: 'PUT',
               headers: {
                   'authorization': props.authToken,
@@ -101,7 +101,7 @@ export default function LayerForm(props: LayerFormProps) {
           {
             try
             {
-              await fetch('http://localhost:3000/api/LayerData/' + props.layerConfig.id, {
+              await fetch('/api/LayerData/' + props.layerConfig.id, {
                 method: 'DELETE',
                 headers: {
                     'authorization': props.authToken ?? '',

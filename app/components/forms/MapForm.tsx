@@ -135,7 +135,7 @@ const POSTMapForm = (props: POSTMapFormProps) => {
   });
 
   const getMaps = () => {
-    fetch('http://localhost:3000/api/map', {
+    fetch('/api/map', {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json',

@@ -42,7 +42,7 @@ const SectionLayerGroupItemComponent = (props: SectionLayerGroupItemProps) => {
 
     const UpLayerData = async (id: string) => {
         try {
-            await fetch('http://localhost:3000/api/LayerData/Rearrange/Up/' + id, {
+            await fetch('/api/LayerData/Rearrange/Up/' + id, {
                 method: 'PUT'
             });
         }
@@ -53,7 +53,7 @@ const SectionLayerGroupItemComponent = (props: SectionLayerGroupItemProps) => {
 
     const DownLayerData = async (id: string) => {
         try {
-            await fetch('http://localhost:3000/api/LayerData/Rearrange/Down/' + id, {
+            await fetch('/api/LayerData/Rearrange/Down/' + id, {
                 method: 'PUT'
             });
         }

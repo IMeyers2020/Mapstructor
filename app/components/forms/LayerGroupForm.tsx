@@ -94,7 +94,7 @@ const NewLayerGroupForm = (props: NewLayerGroupFormProps) => {
                       {
                         try
                         {
-                          await fetch('http://localhost:3000/api/LayerGroup/' + props.layerGroup.id, {
+                          await fetch('/api/LayerGroup/' + props.layerGroup.id, {
                             method: 'PUT',
                             headers: {
                                 'authorization': props.authToken,
@@ -121,7 +121,7 @@ const NewLayerGroupForm = (props: NewLayerGroupFormProps) => {
                         {
                           try
                           {
-                            await fetch('http://localhost:3000/api/LayerGroup/' + props.layerGroup.id, {
+                            await fetch('/api/LayerGroup/' + props.layerGroup.id, {
                               method: 'DELETE',
                               headers: {
                                 'authorization': props.authToken,

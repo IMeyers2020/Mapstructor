@@ -47,7 +47,7 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
     const fetchLayerSection = async (id: string) => {
         setIsLoading(true);
         try {
-            await fetch('http://localhost:3000/api/LayerSection/' + id) 
+            await fetch('/api/LayerSection/' + id) 
             .then((response) => {
             response.json()?.then(parsed => {
                 setLayerSection(parsed.layerSection);
@@ -64,7 +64,7 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
     const fetchLayerGroup = async (id: string) => {
         setIsLoading(true);
         try {
-            await fetch('http://localhost:3000/api/LayerGroup/' + id) 
+            await fetch('/api/LayerGroup/' + id) 
             .then((response) => {
             response.json()?.then(parsed => {
                 setLayerGroup(parsed.layerGroup);
@@ -81,7 +81,7 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
     const UpLayerSection = async (id: string) => {
         setIsLoading(true);
         try {
-            await fetch('http://localhost:3000/api/LayerSection/Rearrange/Up/' + id, {
+            await fetch('/api/LayerSection/Rearrange/Up/' + id, {
                 method: 'PUT'
             });
         }
@@ -96,7 +96,7 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
     const DownLayerSection = async (id: string) => {
         setIsLoading(true);
         try {
-            await fetch('http://localhost:3000/api/LayerSection/Rearrange/Down/' + id, {
+            await fetch('/api/LayerSection/Rearrange/Down/' + id, {
                 method: 'PUT'
             });
         }
