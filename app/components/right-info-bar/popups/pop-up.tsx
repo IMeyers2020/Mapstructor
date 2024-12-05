@@ -1,6 +1,5 @@
 import { GenericPopUpProps } from "@/app/models/popups/pop-up.model";
-import { useEffect, useState } from "react";
-import { render } from "react-dom";
+import { useState } from "react";
 
 const SliderPopUp = (props: GenericPopUpProps) => {
     const [renderedEntity, setRenderedEntity] = useState(null);

@@ -960,9 +960,10 @@ export default function Home() {
 
         <>
           {
-            (currSectionLayers ?? []).map(secLayer => {
+            (currSectionLayers ?? []).map((secLayer, idx) => {
               return (
                 <SectionLayerComponent
+                key={'section-layer-component-'+idx}
                 authToken={currAuthToken}
                 activeLayers={activeLayerIds} 
                 activeLayerCallback={(newActiveLayers: string[]) => {
