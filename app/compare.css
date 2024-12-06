@@ -18,8 +18,8 @@
   }
   
   .mapboxgl-ctrl-bottom-right {
-    bottom: 17px;
-    right: 300px;
+    bottom: 16px;
+    right: 275px;
   }
   
   .mapboxgl-ctrl-group {
@@ -33,29 +33,4 @@
   .mapboxgl-ctrl-group > button + button {
     border-top: 0;
     border-left: 1px solid #ddd;
-  }
-
-  #datepanel {
-    position: absolute;
-    float: right;
-    bottom: 80px;
-    right: 20px;
-    border: solid 4px #000000;
-    border-radius: 8px;
-    background: #3989c1;
-    padding: 5px 20px 5px 0px;
-    color: #ffffff;
-    z-index: 500;
-    word-spacing: 5px;
-    min-width: 260px;
-    text-align: right;
-  }
-
-  #date {
-    font-size: 34px;
-    font-family: Segoe UI,Arial,sans-serif;
-    width: 150px;
-    background: none;
-    border: 0;
-    text-align: center;
   }

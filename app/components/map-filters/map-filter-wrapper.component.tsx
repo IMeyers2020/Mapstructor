@@ -106,7 +106,6 @@ const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {
           displayZoomButton={false}
           displayInfoButton
         ></MapFilterComponent>
-        <br />
         <div id="maps-group">
           {props.mapGroups.map((m, idx) => (
             <MapFiltersGroupComponent
@@ -132,16 +131,6 @@ const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {
             afterClose={props.afterClose}
           ></ZoomLabelButton>
           <button
-            style={{
-              borderColor: "grey",
-              borderWidth: "1px",
-              borderStyle: "solid",
-              borderRadius: "5px",
-              padding: "1px",
-              paddingLeft: "5px",
-              paddingRight: "5px",
-              marginLeft: "5px",
-            }}
             onClick={() => props.zoomToWorld()}
             id="zoom-world"
           >

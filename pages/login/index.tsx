@@ -187,7 +187,7 @@ const Home = () => {
           
           <div style={{ marginBottom: '15px' }}>
               <label htmlFor="password" style={labelStyling}>Password:</label>
-              <input type="text" id="password" name="password" onChange={formik.handleChange} value={formik.values.password} style={boxStyling} />
+              <input type="password" id="password" name="password" onChange={formik.handleChange} value={formik.values.password} style={boxStyling} />
           </div>
           <button style={buttonStyling}
             type="submit">

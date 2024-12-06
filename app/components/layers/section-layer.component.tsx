@@ -1,6 +1,6 @@
 import { SectionLayer, SectionLayerGroup, SectionLayerItem } from "@/app/models/layers/layer.model";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useState } from "react";
+import { useRef, useState, useContext } from "react";
 import { faMinusSquare, faPlusSquare, faPlayCircle } from "@fortawesome/free-regular-svg-icons";
 import SectionLayerGroupComponent from "./section-layer-group.component";
 import NewSectionLayerGroup from "../new-section-layer-group.component";
@@ -13,6 +13,7 @@ import { getFontawesomeIcon } from "@/app/helpers/font-awesome.helper";
 import { FontAwesomeLayerIcons } from "@/app/models/font-awesome.model";
 import NewLayerSectionForm from "../forms/NewLayerSectionForm";
 import { IconColors } from "@/app/models/colors.model";
+import {CSSTransition} from 'react-transition-group';
 
 
 type SectionLayerProps = {
@@ -37,12 +38,51 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [layerGroup, setLayerGroup] = useState<PrismaLayerGroup>();
     const [layerSection, setLayerSection] = useState<PrismaLayerGroup>();
+    const nodeRef = useRef<HTMLDivElement | null>(null);
 
     const closeEdit = () => {
         props.afterClose();
         setEditOpen(false);
         setLayerGroup(undefined);
     }
+
+    //handle functions for animation
+    const handleEnter = () => {
+        if (nodeRef.current) {
+        nodeRef.current.style.height = "0px";
+        }
+    };
+
+    const handleEntering = () => {
+        if (nodeRef.current) {
+        nodeRef.current.style.height = `${nodeRef.current.scrollHeight}px`;
+        }
+    };
+
+    const handleEntered = () => {
+        if (nodeRef.current) {
+        nodeRef.current.style.height = "auto";
+        }
+    };
+
+    const handleExit = () => {
+        if (nodeRef.current) {
+        nodeRef.current.style.height = `${nodeRef.current.scrollHeight}px`;
+        nodeRef.current.style.overflow = "hidden";
+        }
+    };
+
+    const handleExiting = () => {
+        if (nodeRef.current) {
+        nodeRef.current.style.height = "0px";
+        }
+    };
+
+    const handleExited = () => {
+        if (nodeRef.current) {
+        nodeRef.current.style.height = "0px";
+        }
+    };
 
     const fetchLayerSection = async (id: string) => {
         setIsLoading(true);
@@ -197,60 +237,73 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
                     </>
                 )}
             </center>
-            {
-                layerIsOpen &&
-                props.layer.groups.map((grp, idx) => (
-                    <SectionLayerGroupComponent
-                        authToken={props.authToken}
-                        key={`section-layer-component-${idx}`}
-                        activeLayers={props.activeLayers}
-                        activeLayerCallback={props.activeLayerCallback}
-                        layersHeader={props.layersHeader}
-                        group={grp}
-                        openWindow={props.openWindow}
-                        beforeOpen={props.beforeOpen}
-                        afterClose={props.afterClose}
-                        sectionName={props.layer.id}
-                        mapZoomCallback={props.mapZoomCallback}
-                        fetchLayerGroupCallback={fetchLayerGroup}
-                        editFormVisibleCallback={setEditOpen}
-                        removeMapLayerCallback={props.removeMapLayerCallback}
-                        afterSubmit={props.afterSubmit}/>
-                ))
-            }
-            {
-                layerIsOpen && (
+            <CSSTransition
+                in={layerIsOpen}
+                timeout={500}
+                classNames="layersection"
+                unmountOnExit
+                nodeRef={nodeRef}
+                onEnter={handleEnter}
+                onEntering={handleEntering}
+                onEntered={handleEntered}
+                onExit={handleExit}
+                onExiting={handleExiting}
+                onExited={handleExited}>
+                <div ref={nodeRef} className="layersection">
+                    {
+                        props.layer.groups.map((grp, idx) => (
+                            <SectionLayerGroupComponent
+                                authToken={props.authToken}
+                                key={`section-layer-component-${idx}`}
+                                activeLayers={props.activeLayers}
+                                activeLayerCallback={props.activeLayerCallback}
+                                layersHeader={props.layersHeader}
+                                group={grp}
+                                openWindow={props.openWindow}
+                                beforeOpen={props.beforeOpen}
+                                afterClose={props.afterClose}
+                                sectionName={props.layer.id}
+                                mapZoomCallback={props.mapZoomCallback}
+                                fetchLayerGroupCallback={fetchLayerGroup}
+                                editFormVisibleCallback={setEditOpen}
+                                removeMapLayerCallback={props.removeMapLayerCallback}
+                                afterSubmit={props.afterSubmit}/>
+                        ))
+                    }
                     <NewSectionLayerGroup
                         authToken={props.authToken}
                         beforeOpen={props.beforeOpen}
                         afterClose={props.afterClose}
                         sectionLayerId={props.layer.id}
                     ></NewSectionLayerGroup>
-                )
-            }
-            {
-                editOpen && (
-                    <Modal
-                        style={{
-                            content: {
-                                width: '30%',
-                                right: '5px'
-                            }
-                        }}
-                        isOpen={editOpen}
-                        onRequestClose={() => {closeEdit();}}
-                        contentLabel='Edit Layer Group'
-                    >
-                        {isLoading ? (
-                            <Loader
-                            center={true}/>
-                            ) : (
-                            <NewLayerGroupForm authToken={props.authToken} sectionLayerId={props.layer.id} layerGroup={layerGroup} afterSubmit={closeEdit}></NewLayerGroupForm>
-                            )
-                        }
-                    </Modal>
-                )
-            }
+                    {
+                        editOpen && (
+                            <Modal
+                                style={{
+                                    overlay: {
+                                        zIndex: "1000",
+                                    },
+                                    content: {
+                                        width: '30%',
+                                        right: '5px'
+                                    }
+                                }}
+                                isOpen={editOpen}
+                                onRequestClose={() => {closeEdit();}}
+                                contentLabel='Edit Layer Group'
+                            >
+                                {isLoading ? (
+                                    <Loader
+                                    center={true}/>
+                                    ) : (
+                                    <NewLayerGroupForm authToken={props.authToken} sectionLayerId={props.layer.id} layerGroup={layerGroup} afterSubmit={closeEdit}></NewLayerGroupForm>
+                                    )
+                                }
+                            </Modal>
+                        )
+                    }
+                </div>
+            </CSSTransition>
         </>
     )
 }

@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken";
 import { error } from "console";
 import { blacklistedTokens } from "./blacklist/blacklist";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
 export function Auth(request:Request) {
+
+  const JWT_SECRET = process.env.JWT_SECRET;
 
   const authHeader = request.headers.get('authorization');
     

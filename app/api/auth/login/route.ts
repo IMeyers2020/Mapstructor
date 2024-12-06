@@ -1,9 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs"; 
 import jwt from "jsonwebtoken";
-import { User } from "@prisma/client";
-import { getCookie } from "cookies-next";
+import { setCookie } from "cookies-next";
 
 // Login
 export async function POST(request: Request) {
@@ -42,7 +40,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const JWT_SECRET = user.encrypted;
+        const JWT_SECRET = process.env.JWT_SECRET;
         const token = jwt.sign(
             { userId: exsituser.id, username: exsituser.username },
             JWT_SECRET,

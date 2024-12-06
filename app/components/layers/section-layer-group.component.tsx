@@ -202,7 +202,6 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
                         <div className="tooltip-container" data-title="Group Info">
                                 <FontAwesomeIcon
                                 className="layer-info trigger-popup"
-                                title="Layer Info"
                                 color="grey"
                                 icon={faInfoCircle}
                                 onClick={() => {}/*zoomtocenter(layerData.zoomTo || "N/A")*/} // Edit This to pull up a modal
@@ -248,6 +247,9 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
                 (
                     <Modal
                         style={{
+                            overlay: {
+                                zIndex: "1000",
+                            },
                             content: {
                                 width: '30%',
                                 right: '5px'

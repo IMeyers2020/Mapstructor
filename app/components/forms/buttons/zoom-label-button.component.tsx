@@ -38,6 +38,9 @@ const ZoomLabelButton = (props: ZoomLabelButtonProps) => {
             }
             <Modal
                 style={{
+                    overlay: {
+                        zIndex: "1000",
+                    },
                     content: {
                         width: '30%',
                         right: '5px'

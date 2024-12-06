@@ -8,7 +8,7 @@ export async function POST(request:Request) {
 
   const authHeader = request.headers.get('authorization');
 
-  const JWT_SECRET = getCookie('authToken');
+  const JWT_SECRET = process.env.JWT_SECRET;
 
   Auth(request);
     

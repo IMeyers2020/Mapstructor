@@ -236,7 +236,7 @@ const NewLayerGroupForm = (props: NewLayerGroupFormProps) => {
                   await formik.submitForm();
                 }}
               >
-                Delete Layer
+                Delete Group
               </button>
             </>
           ) : (

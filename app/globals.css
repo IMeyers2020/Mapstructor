@@ -944,12 +944,6 @@ label#close:active {
     width: 111px;
   }
 
-  #datepanel {
-    border: solid 2px #000000;
-    padding: 3px 15px 3px 0px;
-    min-width: 134px;
-  }
-
   div#navpanel {
     bottom: 138px;
     right: 15px;
@@ -991,6 +985,32 @@ label#close:active {
   transform: scaleY(0);
   transition: transform 0.3s ease-out;
   transform-origin: top;
+}
+
+.mapgroup-enter,
+.layersection-enter {
+  height: 0;
+  overflow: hidden;
+}
+
+.mapgroup-enter-active,
+.layersection-enter-active {
+  height: auto;
+  transition: height 0.5s ease-out;
+  overflow: hidden;
+}
+
+.mapgroup-enter,
+.layersection-exit {
+  height: auto; 
+  overflow: hidden;
+}
+
+.mapgroup-exit-active,
+.layersection-exit-active {
+  height: 0;
+  transition: height 0.5s ease-out;
+  overflow: hidden;
 }
 
 /* Loader.css */
