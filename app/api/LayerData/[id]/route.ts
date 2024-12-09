@@ -40,6 +40,7 @@ export async function PUT(request: Request, context: any) {
             sourceUrl: Layerr.sourceUrl,
             sourceId: Layerr.sourceId,
             paint: Layerr.paint,
+            layout: Layerr.layout,
             sourceLayer: Layerr.sourceLayer,
             hover: Layerr.hover,
             time: Layerr.time,

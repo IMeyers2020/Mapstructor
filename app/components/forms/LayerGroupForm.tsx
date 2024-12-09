@@ -55,9 +55,11 @@ const NewLayerGroupForm = (props: NewLayerGroupFormProps) => {
             latitude: props.layerGroup?.latitude ?? '',
             zoom: props.layerGroup?.zoom ?? '',
             bearing: props.layerGroup?.bearing ?? '',
+            infoId: props.layerGroup?.infoId ?? ''
         },
           
         onSubmit: async (values) => {
+          console.log(values);
             if(values.name?.length > 0) {
                 const resultingLayerGroup = {
                     name: values.name,
@@ -66,6 +68,7 @@ const NewLayerGroupForm = (props: NewLayerGroupFormProps) => {
                     latitude: values.latitude,
                     zoom: values.zoom as number,
                     bearing: values.bearing as number,
+                    infoId: values.infoId
                 }
                 if(submitType === "POST")
                     {
@@ -200,6 +203,17 @@ const NewLayerGroupForm = (props: NewLayerGroupFormProps) => {
                     name="bearing"
                     onChange={formik.handleChange}
                     value={formik.values.bearing}
+                    style={boxStyling}
+                />
+              </div>
+              <div style={{ marginBottom: '15px' }}>
+                <label htmlFor="infoId" style={labelStyling}>Drupal Info Id:</label>
+                <input
+                    type="text"
+                    id="infoId"
+                    name="infoId"
+                    onChange={formik.handleChange}
+                    value={formik.values.infoId}
                     style={boxStyling}
                 />
               </div>

@@ -1,6 +1,6 @@
 import { SectionLayer, SectionLayerGroup, SectionLayerItem } from "@/app/models/layers/layer.model";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import SectionLayerGroupItemComponent from "./section-layer-group-item.component";
 import { faCrosshairs, faInfoCircle, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { getFontawesomeIcon } from "@/app/helpers/font-awesome.helper";
@@ -27,7 +27,8 @@ type SectionLayerGroupsProps = {
     fetchLayerGroupCallback: (id: string) => void,
     removeMapLayerCallback: (id: string) => void,
     afterSubmit: () => void,
-    authToken: string
+    authToken: string,
+    inPreviewMode: boolean
 }
 
 const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
@@ -36,6 +37,51 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [checkboxValue, setcheckboxValue] = useState<boolean>(false);
     const [layer, setLayer] = useState<PrismaLayer>();
+    const [modalHeaderText, setModalHeaderText] = useState<string>('');
+    const [modalBodyText, setModalBodyText] = useState<string>('');
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [showEditorOptions, setShowEditorOptions] = useState<boolean>(false);
+
+    const closeWindow = () => {
+        props.afterClose()
+        setModalOpen(false)
+    }
+
+    useEffect(() => {
+        const isAuthed: boolean = (props.authToken ?? '') != '';
+        const inPreviewMode: boolean = props.inPreviewMode ?? false;
+
+        setShowEditorOptions(isAuthed && !inPreviewMode);
+    }, [props.authToken, props.inPreviewMode])
+
+    useEffect(() => {
+        if(props.group.infoId != null && props.group.infoId.length > 0) {
+            if(modalHeaderText == null || modalHeaderText.length == 0 || modalBodyText == null || modalBodyText.length == 0) {
+                fetch('https://encyclopedia.nahc-mapping.org/info-text-export', {
+                    method: "GET",
+                    headers: {
+                      "Content-Type": "application/x-www-form-urlencoded",
+                    }
+                }).then(response => {
+                    if(response.ok) {
+                        response.json().then((jsonResult: {title: string, id: string, body: string }[]) => {
+                            if(jsonResult != null && jsonResult.length > 0) {
+                                let modalHeader: string = jsonResult.find(x => x.id == props.group.infoId)?.title ?? '';
+                                let modalBody: string = jsonResult.find(x => x.id == props.group.infoId)?.body ?? '';
+                                setModalHeaderText(modalHeader);
+                                setModalBodyText(modalBody);
+                            }
+                            console.log(jsonResult);
+                        })
+                    }
+                })
+            }
+        }
+    }, [])
+
+    useEffect(() => {
+        console.log(modalHeaderText, modalBodyText)
+    }, [modalBodyText, modalHeaderText])
     
     const toggleGroup = (e: any) => {
         if(props.group.items.length > 0) {
@@ -140,7 +186,7 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
                 <div className="layer-buttons-block">
                     <div className="layer-buttons-list">
                         {
-                            (props.authToken ?? '') !== '' && (
+                            showEditorOptions && (
                                 <div className="tooltip-container" data-title="Edit Group">
                                 <FontAwesomeIcon
                                     className="edit-button"
@@ -156,7 +202,7 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
                             )
                         }
                         {
-                            (props.authToken ?? '') !== '' && (
+                            showEditorOptions && (
                                 <div className="tooltip-container" data-title="Move Up">        
                                 <FontAwesomeIcon 
                                     className="decrement-order"
@@ -171,7 +217,7 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
                             )
                         }
                         {
-                            (props.authToken ?? '') !== '' && (
+                            showEditorOptions && (
                                 <div className="tooltip-container" data-title="Move Down">
                                 <FontAwesomeIcon 
                                     className="increment-order"
@@ -199,14 +245,18 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
                                 })} // Edit zoomFunctions.js to create this function
                                 />
                         </div>
-                        <div className="tooltip-container" data-title="Group Info">
-                                <FontAwesomeIcon
-                                className="layer-info trigger-popup"
-                                color="grey"
-                                icon={faInfoCircle}
-                                onClick={() => {}/*zoomtocenter(layerData.zoomTo || "N/A")*/} // Edit This to pull up a modal
-                                />
-                        </div>
+                        {
+                            (modalHeaderText.length > 0 && modalBodyText.length > 0) && (
+                                <div className="tooltip-container" data-title="Group Info">
+                                    <FontAwesomeIcon
+                                    className="layer-info trigger-popup"
+                                    color="grey"
+                                    icon={faInfoCircle}
+                                    onClick={() => setModalOpen(true)} // Edit This to pull up a modal
+                                    />
+                                </div>
+                            )
+                        }
                     </div>
                 </div>
             </div>
@@ -215,6 +265,7 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
                     return (
                         <>
                             <SectionLayerGroupItemComponent
+                                inPreviewMode={props.inPreviewMode}
                                 authToken={props.authToken}
                                 key={'seclaygroupitem' + idx}
                                 activeLayers={props.activeLayers}
@@ -234,6 +285,7 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
                 (layerIsOpen || props.group?.items?.length == 0) &&
                 (
                     <NewSectionLayerGroupItem
+                    inPreviewMode={props.inPreviewMode}
                     authToken={props.authToken}
                     beforeOpen={props.beforeOpen} 
                     afterClose={props.afterClose} 
@@ -279,6 +331,32 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
                         )
                     }
                     </Modal> 
+                )
+            }
+            {
+                modalBodyText.length > 0 && (
+                    <Modal
+                        style={{
+                            overlay: {
+                                zIndex: "1000",
+                            },
+                            content: {
+                                width: '50%',
+                                right: '25%'
+                            }
+                        }}
+                        isOpen={modalOpen}
+                        onRequestClose={closeWindow}
+                        contentLabel={modalHeaderText}
+                    >
+                        <div className="modal-header">
+                            <h1>
+                                {modalHeaderText}
+                            </h1>
+                        </div>
+                        <div className="modal-content" dangerouslySetInnerHTML={{__html: modalBodyText}}>
+                        </div>
+                    </Modal>
                 )
             }
         </>

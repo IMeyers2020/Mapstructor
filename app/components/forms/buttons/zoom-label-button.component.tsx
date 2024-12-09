@@ -1,6 +1,5 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Modal from 'react-modal';
-import MapForm from '../MapForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getFontawesomeIcon } from '@/app/helpers/font-awesome.helper';
 import { FontAwesomeLayerIcons } from '@/app/models/font-awesome.model';
@@ -9,11 +8,20 @@ import ZoomLabelForm from '../ZoomLabelForm';
 type ZoomLabelButtonProps = {
     beforeOpen: () => void,
     afterClose: () => void,
-    authToken: string
+    authToken: string,
+    inPreviewMode: boolean
 }
 
 const ZoomLabelButton = (props: ZoomLabelButtonProps) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [showEditorOptions, setShowEditorOptions] = useState<boolean>(false);
+
+    useEffect(() => {
+        const isAuthed: boolean = (props.authToken ?? '') != '';
+        const inPreviewMode: boolean = props.inPreviewMode ?? false;
+
+        setShowEditorOptions(isAuthed && !inPreviewMode);
+    }, [props.authToken, props.inPreviewMode])
 
     const openWindow = () => {
         props.beforeOpen()
@@ -28,7 +36,7 @@ const ZoomLabelButton = (props: ZoomLabelButtonProps) => {
     return (
         <>
             {
-                (props.authToken ?? '') !== '' && (
+                showEditorOptions && (
                     <button
                         onClick={openWindow} id="zoom-world">
                             <FontAwesomeIcon icon={getFontawesomeIcon(FontAwesomeLayerIcons.NOTES_MEDICAL)}></FontAwesomeIcon>

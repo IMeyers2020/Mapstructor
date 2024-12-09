@@ -11,10 +11,19 @@ type MapFormButtonProps = {
     groupName: string,
     beforeOpen: () => void,
     afterClose: () => void,
+    inPreviewMode: boolean
 }
 
 const NewMapGroupItem = (props: MapFormButtonProps) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [showEditorOptions, setShowEditorOptions] = useState<boolean>(false);
+
+    useEffect(() => {
+        const isAuthed: boolean = (props.authToken ?? '') != '';
+        const inPreviewMode: boolean = props.inPreviewMode ?? false;
+
+        setShowEditorOptions(isAuthed && !inPreviewMode);
+    }, [props.authToken, props.inPreviewMode])
     
     const openWindow = () => {
         props.beforeOpen()
@@ -32,7 +41,7 @@ const NewMapGroupItem = (props: MapFormButtonProps) => {
     return (
         <>
             {
-                (props.authToken ?? '') !== '' && (
+                showEditorOptions && (
                     <div style={{paddingTop: '5px', paddingLeft: '15px', paddingRight: '10px', textAlign: 'center'}}>
                         <button id='post-button' onClick={openWindow}>
                             <FontAwesomeIcon icon={getFontawesomeIcon(FontAwesomeLayerIcons.PLUS_SQUARE, true)}></FontAwesomeIcon> New Map

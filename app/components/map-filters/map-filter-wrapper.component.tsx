@@ -20,12 +20,21 @@ export type MapFilterWrapperProps = {
   afterMapCallback: (map: MapItem) => void;
   zoomToWorld: () => void;
   mapZoomCallback: (zoomProps: MapZoomProps) => void;
-  authToken: string
+  authToken: string;
+  inPreviewMode: boolean;
 };
 
 const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {
   const [showForm, setShowForm] = useState(false);
   const [buttonLinks, setButtonLinks] = useState<ButtonLink[]>([]);
+  const [showEditorOptions, setShowEditorOptions] = useState<boolean>(false);
+
+  useEffect(() => {
+      const isAuthed: boolean = (props.authToken ?? '') != '';
+      const inPreviewMode: boolean = props.inPreviewMode ?? false;
+
+      setShowEditorOptions(isAuthed && !inPreviewMode);
+  }, [props.authToken, props.inPreviewMode])
 
   // Fetches button links from the backend on page load
   useEffect(() => {
@@ -99,6 +108,7 @@ const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {
       <div>
         <p className="title">MAPS</p>
         <MapFilterComponent
+          afterClose={props.afterClose}
           mapZoomCallback={props.mapZoomCallback}
           beforeMapCallback={props.beforeMapCallback}
           afterMapCallback={props.afterMapCallback}
@@ -109,6 +119,7 @@ const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {
         <div id="maps-group">
           {props.mapGroups.map((m, idx) => (
             <MapFiltersGroupComponent
+              inPreviewMode={props.inPreviewMode}
               authToken={props.authToken}
               beforeOpen={props.beforeOpen}
               afterClose={props.afterClose}
@@ -126,6 +137,7 @@ const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {
           }}
         >
           <ZoomLabelButton
+            inPreviewMode={props.inPreviewMode}
             authToken={props.authToken}
             beforeOpen={props.beforeOpen}
             afterClose={props.afterClose}
@@ -143,7 +155,7 @@ const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {
 
         {/* Manage Button Links Section */}
         {
-          (props.authToken ?? '') !== '' && (
+          showEditorOptions && (
             <center style={{ marginTop: "15px" }}>
               <button
                 id="button-link"
@@ -178,7 +190,7 @@ const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {
           }}
         >
           {buttonLinks.map((link) => (
-            <ButtonLinkButton authToken={props.authToken} key={link.id} buttonLink={link} onDelete={handleDeleteButtonLink} />
+            <ButtonLinkButton inPreviewMode={props.inPreviewMode} authToken={props.authToken} key={link.id} buttonLink={link} onDelete={handleDeleteButtonLink} />
           ))}
         </div>
       </div>

@@ -28,5 +28,6 @@ export type SectionLayerGroup = {
     items: SectionLayerItem[],
     center?: [long: number, lat: number],
     zoom?: number,
-    bearing?: number
+    bearing?: number,
+    infoId?: string
 }

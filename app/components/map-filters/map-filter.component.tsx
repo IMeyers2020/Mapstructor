@@ -2,6 +2,8 @@ import { getFontawesomeIcon } from "@/app/helpers/font-awesome.helper"
 import { FontAwesomeLayerIcons } from "@/app/models/font-awesome.model"
 import { MapItem, MapZoomProps } from "@/app/models/maps/map.model"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useEffect, useState } from "react"
+import Modal from 'react-modal';
 
 
 type MapFilterComponentProps = {
@@ -10,10 +12,49 @@ type MapFilterComponentProps = {
     displayInfoButton: boolean,
     beforeMapCallback: (map: MapItem) => void,
     afterMapCallback: (map: MapItem) => void,
-    mapZoomCallback: (zoomProps: MapZoomProps) => void
+    mapZoomCallback: (zoomProps: MapZoomProps) => void,
+    afterClose: () => void
 }
 
 const MapFilterComponent = (props: MapFilterComponentProps) => {
+    const [modalHeaderText, setModalHeaderText] = useState<string>('');
+    const [modalBodyText, setModalBodyText] = useState<string>('');
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
+
+    const closeWindow = () => {
+        props.afterClose()
+        setModalOpen(false)
+    }
+
+    useEffect(() => {
+        if(props.map.infoId != null && props.map.infoId.length > 0) {
+            if(modalHeaderText == null || modalHeaderText.length == 0 || modalBodyText == null || modalBodyText.length == 0) {
+                fetch('https://encyclopedia.nahc-mapping.org/info-text-export', {
+                    method: "GET",
+                    headers: {
+                      "Content-Type": "application/x-www-form-urlencoded",
+                    }
+                }).then(response => {
+                    if(response.ok) {
+                        response.json().then((jsonResult: {title: string, id: string, body: string }[]) => {
+                            if(jsonResult != null && jsonResult.length > 0) {
+                                let modalHeader: string = jsonResult.find(x => x.id == props.map.infoId)?.title ?? '';
+                                let modalBody: string = jsonResult.find(x => x.id == props.map.infoId)?.body ?? '';
+                                setModalHeaderText(modalHeader);
+                                setModalBodyText(modalBody);
+                            }
+                            console.log(jsonResult);
+                        })
+                    }
+                })
+            }
+        }
+    }, [])
+
+    useEffect(() => {
+        console.log(modalHeaderText, modalBodyText)
+    }, [modalBodyText, modalHeaderText])
+
     return (
         <>
             <div className="layer-list-row">
@@ -70,27 +111,47 @@ const MapFilterComponent = (props: MapFilterComponentProps) => {
                             )
                         }
                         {
-                            props.displayInfoButton &&
+                            (modalHeaderText.length > 0 && modalBodyText.length > 0) &&
                             (
                                 <div className="tooltip-container" data-title="Map Info">
                                     <FontAwesomeIcon
                                     className="layer-info trigger-popup"
                                     color="grey"
                                     icon={getFontawesomeIcon(FontAwesomeLayerIcons.INFO_CIRCLE)}
-                                    onClick={() => {}/*zoomtocenter(layerData.zoomTo || "N/A")*/} // Edit This to pull up a modal
+                                    onClick={() => setModalOpen(true)} // Edit This to pull up a modal
                                     />
                                 </div>
-                            )
-                        }
-                        {
-                            !props.displayInfoButton &&
-                            (
-                                <i style={{width: "16px"}}></i>
                             )
                         }
                     </div>
                 </div>
             </div>
+            {
+                modalBodyText.length > 0 && (
+                    <Modal
+                        style={{
+                            overlay: {
+                                zIndex: "1000",
+                            },
+                            content: {
+                                width: '50%',
+                                right: '25%'
+                            }
+                        }}
+                        isOpen={modalOpen}
+                        onRequestClose={closeWindow}
+                        contentLabel={modalHeaderText}
+                    >
+                        <div className="modal-header">
+                            <h1>
+                                {modalHeaderText}
+                            </h1>
+                        </div>
+                        <div className="modal-content" dangerouslySetInnerHTML={{__html: modalBodyText}}>
+                        </div>
+                    </Modal>
+                )
+            }
         </>
     )
 }

@@ -4,7 +4,11 @@ import { LayerData } from "@prisma/client";
 
 export async function GET() {
     const prisma = new PrismaClient();
-    const LayerData = (await prisma.layerData.findMany())
+    const LayerData = (await prisma.layerData.findMany({
+        orderBy: {
+            viewOrder: 'asc'
+        }
+    }))
 
     return NextResponse.json({
         LayerData
@@ -20,6 +24,8 @@ export async function POST(request: Request) {
             topLayerClass: layerData.topLayerClass
         }
     })
+
+    const viewIdx = await prisma.layerData.count({})
 
     try {
         const r = await prisma.layerData.create({
@@ -39,6 +45,7 @@ export async function POST(request: Request) {
                 sourceUrl:layerData.sourceUrl,
                 sourceId:layerData.sourceId,
                 paint:layerData.paint,
+                layout:layerData.layout,
                 sourceLayer:layerData.sourceLayer,
                 hover:layerData.hover,
                 time:layerData.time,
@@ -47,7 +54,8 @@ export async function POST(request: Request) {
                 clickStyle:layerData.clickStyle,
                 clickHeader:layerData.clickHeader,
                 hoverContent:layerData.hoverContent,
-                order:idx + 1
+                order:idx + 1,
+                viewOrder:viewIdx + 1
             }
         })
         return NextResponse.json({
@@ -89,7 +97,8 @@ export async function PUT(request: Request) {
                 sourceLayer:layerData.sourceLayer,
                 hover:layerData.hover,
                 time:layerData.time,
-                click:layerData.click
+                click:layerData.click,
+                viewOrder:layerData.viewOrder
             }
         })
         return NextResponse.json({

@@ -1,6 +1,6 @@
 import { SectionLayer, SectionLayerGroup, SectionLayerItem } from "@/app/models/layers/layer.model";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useRef, useState, useContext } from "react";
+import { useRef, useState, useContext, useEffect } from "react";
 import { faMinusSquare, faPlusSquare, faPlayCircle } from "@fortawesome/free-regular-svg-icons";
 import SectionLayerGroupComponent from "./section-layer-group.component";
 import NewSectionLayerGroup from "../new-section-layer-group.component";
@@ -28,7 +28,8 @@ type SectionLayerProps = {
     getLayerSectionsCallback: () => void,
     removeMapLayerCallback: (id: string) => void,
     afterSubmit: () => void,
-    authToken: string
+    authToken: string,
+    inPreviewMode: boolean
 }
 
 const SectionLayerComponent = (props: SectionLayerProps) => {
@@ -39,6 +40,14 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
     const [layerGroup, setLayerGroup] = useState<PrismaLayerGroup>();
     const [layerSection, setLayerSection] = useState<PrismaLayerGroup>();
     const nodeRef = useRef<HTMLDivElement | null>(null);
+    const [showEditorOptions, setShowEditorOptions] = useState<boolean>(false);
+
+    useEffect(() => {
+        const isAuthed: boolean = (props.authToken ?? '') != '';
+        const inPreviewMode: boolean = props.inPreviewMode ?? false;
+
+        setShowEditorOptions(isAuthed && !inPreviewMode);
+    }, [props.authToken, props.inPreviewMode])
 
     const closeEdit = () => {
         props.afterClose();
@@ -179,7 +188,7 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
                         <div className="layer-buttons-block">
                             <div className="layer-buttons-list">
                                 {
-                                    (props.authToken ?? '') !== '' && (
+                                    showEditorOptions && (
                                         <div className="tooltip-container" data-title="Edit Folder">
                                             <FontAwesomeIcon
                                                 className="edit-button"
@@ -196,7 +205,7 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
                                     )
                                 }
                                 {
-                                    (props.authToken ?? '') !== '' && (
+                                    showEditorOptions && (
                                         <div className="tooltip-container" data-title="Move Up">
                                             <FontAwesomeIcon 
                                                 className="decrement-order"
@@ -215,7 +224,7 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
                                     )
                                 }
                                 {
-                                    (props.authToken ?? '') !== '' && (
+                                    showEditorOptions && (
                                         <div className="tooltip-container" data-title="Move Down">   
                                         <FontAwesomeIcon 
                                         className="increment-order"
@@ -253,6 +262,7 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
                     {
                         props.layer.groups.map((grp, idx) => (
                             <SectionLayerGroupComponent
+                                inPreviewMode={props.inPreviewMode}
                                 authToken={props.authToken}
                                 key={`section-layer-component-${idx}`}
                                 activeLayers={props.activeLayers}
@@ -271,6 +281,7 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
                         ))
                     }
                     <NewSectionLayerGroup
+                        inPreviewMode={props.inPreviewMode}
                         authToken={props.authToken}
                         beforeOpen={props.beforeOpen}
                         afterClose={props.afterClose}

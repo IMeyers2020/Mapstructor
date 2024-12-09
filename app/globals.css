@@ -104,6 +104,7 @@ body * {
 
 .header a.encyclopedia,
 .header label#about {
+  cursor: pointer;
   float: left;
   color: black;
   text-align: center;

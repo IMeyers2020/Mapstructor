@@ -17,11 +17,20 @@ type SectionLayerGroupItemProps = {
     fetchLayerDataCallback: (id: string) => void,
     afterSubmit: () => void,
     upperCheckBox: boolean,
-    authToken: string
+    authToken: string,
+    inPreviewMode: boolean
 }
 
 const SectionLayerGroupItemComponent = (props: SectionLayerGroupItemProps) => {
     const [checkbox, setCheckbox] = useState<boolean>(false);
+    const [showEditorOptions, setShowEditorOptions] = useState<boolean>(false);
+
+    useEffect(() => {
+        const isAuthed: boolean = (props.authToken ?? '') != '';
+        const inPreviewMode: boolean = props.inPreviewMode ?? false;
+
+        setShowEditorOptions(isAuthed && !inPreviewMode);
+    }, [props.authToken, props.inPreviewMode])
 
     const handleLayerChange = () => {
         if(props.item.layerId)
@@ -86,7 +95,7 @@ const SectionLayerGroupItemComponent = (props: SectionLayerGroupItemProps) => {
                 <div className="layer-buttons-block">
                     <div className="layer-buttons-list">
                         {
-                            (props.authToken ?? '') !== '' && (
+                            showEditorOptions && (
                                 <div className="tooltip-container" data-title="Edit Layer">
                                     <FontAwesomeIcon
                                     className="edit-button"
@@ -102,7 +111,7 @@ const SectionLayerGroupItemComponent = (props: SectionLayerGroupItemProps) => {
                             )
                         }
                         {
-                            (props.authToken ?? '') !== '' && (
+                            showEditorOptions && (
                                 <div className="tooltip-container" data-title="Move Up">
                                     <FontAwesomeIcon 
                                     className="decrement-order"
@@ -117,7 +126,7 @@ const SectionLayerGroupItemComponent = (props: SectionLayerGroupItemProps) => {
                             )
                         }
                         {
-                            (props.authToken ?? '') !== '' && (
+                            showEditorOptions && (
                                 <div className="tooltip-container" data-title="Move Down">
                                     <FontAwesomeIcon 
                                     className="increment-order"

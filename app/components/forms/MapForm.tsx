@@ -27,7 +27,8 @@ const POSTMapForm = (props: POSTMapFormProps) => {
       styleId:                 undefined,
       groupValue:              undefined,
       newGroupName:            undefined,
-      newGroupLabel:           undefined
+      newGroupLabel:           undefined,
+      infoId:                  ''
     },
     
     onSubmit: async (values) => {
@@ -44,7 +45,8 @@ const POSTMapForm = (props: POSTMapFormProps) => {
           mapId: values.mapId,
           zoom: values.zoom,
           bearing: values.bearing,
-          styleId: values.styleId
+          styleId: values.styleId,
+          infoId: values.infoId
         }]
       }
       if(values.itemId){
@@ -107,7 +109,8 @@ const POSTMapForm = (props: POSTMapFormProps) => {
             defaultCheckedForBeforeMap: true, //change
             defaultCheckedForAfterMap: false, //change
             showInfoButton: true, //change
-            showZoomButton: false //change
+            showZoomButton: false, //change
+            infoId: values.infoId
           }
 
           const response = await fetch('api/map', {
@@ -229,6 +232,11 @@ return (
         <div style={{ marginBottom: '15px' }}>
             <label htmlFor="styleId" style={labelStyling}>StyleId:</label>
             <input type="text" id="styleId" name="styleId" onChange={formik.handleChange} value={formik.values.styleId} style={boxStyling} />
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+            <label htmlFor="infoId" style={labelStyling}>Drupal Info Id:</label>
+            <input type="text" id="infoId" name="infoId" onChange={formik.handleChange} value={formik.values.infoId} style={boxStyling} />
         </div>
 
 

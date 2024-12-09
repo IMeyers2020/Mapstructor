@@ -34,6 +34,7 @@ export async function PUT(request: Request, context: any) {
             latitude: LayerrGroup.latitude,
             zoom: LayerrGroup.zoom,
             bearing: LayerrGroup.bearing,
+            infoId: LayerrGroup.infoId ?? ''
         }
     })
 

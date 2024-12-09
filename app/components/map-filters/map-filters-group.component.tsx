@@ -17,7 +17,8 @@ type MapFiltersGroupComponentProps = {
     mapZoomCallback: (zoomProps: MapZoomProps) => void
     beforeOpen: () => void,
     afterClose: () => void,
-    authToken: string
+    authToken: string,
+    inPreviewMode: boolean
 }
 
 const MapFiltersGroupComponent = (props: MapFiltersGroupComponentProps) => {
@@ -85,13 +86,13 @@ const MapFiltersGroupComponent = (props: MapFiltersGroupComponentProps) => {
                 <div ref={nodeRef}>
                     {
                         props.group.maps.map((map, idx) => (
-                            <MapFilterComponent beforeMapCallback={props.beforeMapCallback} afterMapCallback={props.afterMapCallback} mapZoomCallback={props.mapZoomCallback} key={`map-filter-component-${idx}`} map={map} displayInfoButton displayZoomButton/>
+                            <MapFilterComponent afterClose={props.afterClose} beforeMapCallback={props.beforeMapCallback} afterMapCallback={props.afterMapCallback} mapZoomCallback={props.mapZoomCallback} key={`map-filter-component-${idx}`} map={map} displayInfoButton displayZoomButton/>
                         ))
                         
                     }
                     {
                         // <NewSectionLayerGroupItem beforeOpen={props.beforeOpen} afterClose={props.afterClose} groupName={props.group.id} sectionName={props.sectionName}></NewSectionLayerGroupItem>
-                        <NewMapGroupItem authToken={props.authToken} beforeOpen={props.beforeOpen?? ( () => {})} afterClose={props.afterClose?? ( () => {})} groupId={""} groupName=""></NewMapGroupItem>
+                        <NewMapGroupItem inPreviewMode={props.inPreviewMode} authToken={props.authToken} beforeOpen={props.beforeOpen?? ( () => {})} afterClose={props.afterClose?? ( () => {})} groupId={""} groupName=""></NewMapGroupItem>
                     }
                 </div>
             </CSSTransition>

@@ -3,18 +3,29 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getFontawesomeIcon } from "@/app/helpers/font-awesome.helper";
 import { FontAwesomeLayerIcons } from "@/app/models/font-awesome.model";
 import { faTrash } from "@fortawesome/free-solid-svg-icons"; // Import the trash can icon
+import { useEffect, useState } from "react";
 
 type ButtonLinkButtonProps = {
   authToken: string,
   buttonLink: ButtonLink;
   onDelete: (id: string) => void;
+  inPreviewMode: boolean;
 };
 
 export default function ButtonLinkButton({
   authToken,
   buttonLink,
   onDelete,
+  inPreviewMode
 }: ButtonLinkButtonProps) {
+  const [showEditorOptions, setShowEditorOptions] = useState<boolean>(false);
+
+  useEffect(() => {
+      const isAuthed: boolean = (authToken ?? '') != '';
+      const prev: boolean = inPreviewMode ?? false;
+
+      setShowEditorOptions(isAuthed && !prev);
+  }, [authToken, inPreviewMode])
   
   return (
     <div
@@ -59,7 +70,7 @@ export default function ButtonLinkButton({
         </strong>
       </a>
       {
-        (authToken ?? '') !== '' && (
+        showEditorOptions && (
           <button
             onClick={() => onDelete(buttonLink.id)}
             style={{

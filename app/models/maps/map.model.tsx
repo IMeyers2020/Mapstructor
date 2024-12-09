@@ -5,7 +5,8 @@ export type MapItem = {
     center: [long: number, lat: number],
     zoom: number,
     bearing: number,
-    styleId: string
+    styleId: string,
+    infoId?: string
 }
 
 export type MapZoomProps = {

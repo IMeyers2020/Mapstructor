@@ -43,7 +43,8 @@ export async function POST(request: Request) {
                 latitude:LayerGroup.latitude,
                 zoom:LayerGroup.zoom,
                 bearing:LayerGroup.bearing,
-                order:idx
+                order:idx,
+                infoId:LayerGroup.infoId
             }
         })
         return NextResponse.json({
@@ -72,7 +73,8 @@ export async function PUT(request: Request) {
                 longitude:LayerGroup.longitude,
                 latitude:LayerGroup.latitude,
                 zoom:LayerGroup.zoom,
-                bearing:LayerGroup.bearing  
+                bearing:LayerGroup.bearing,
+                infoId:LayerGroup.infoId
             }
         })
         return NextResponse.json({
