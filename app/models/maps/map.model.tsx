@@ -1,4 +1,5 @@
 export type MapItem = {
+    id: string,
     name: string,
     groupId: string,
     mapId: string,

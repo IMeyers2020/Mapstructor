@@ -1,5 +1,6 @@
 import { LayerData, PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { Auth } from "../../auth/auth";
 
 export async function GET(request: Request, context: any) {
     const {params} = context;
@@ -16,6 +17,12 @@ export async function GET(request: Request, context: any) {
 }
 
 export async function PUT(request: Request, context: any) {
+    if(!Auth(request)){ //protected endpoint
+        return NextResponse.json({
+            message: "Not Authorized",
+            error: "Auth Token Invaild",
+        }, {status: 401});
+      }
     const { params } = context;
     const Layerr = await request.json()
     const prisma = new PrismaClient();
@@ -48,7 +55,7 @@ export async function PUT(request: Request, context: any) {
             hoverStyle:Layerr.hoverStyle,
             clickStyle:Layerr.clickStyle,
             clickHeader:Layerr.clickHeader,
-            hoverContent:Layerr.hoverContent
+            hoverContent:Layerr.hoverContent,
         }
     })
 
@@ -58,6 +65,12 @@ export async function PUT(request: Request, context: any) {
 }
 
 export async function DELETE(request: Request, context: any) {
+    if(!Auth(request)){ //protected endpoint
+        return NextResponse.json({
+            message: "Not Authorized",
+            error: "Auth Token Invaild",
+        }, {status: 401});
+      }
     const {params} = context;
     const prisma = new PrismaClient();
     await prisma.layerData.delete({

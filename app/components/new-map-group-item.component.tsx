@@ -4,7 +4,7 @@ import LayerForm from '../components/forms/LayerForm';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FontAwesomeLayerIcons } from "../models/font-awesome.model";
 import { getFontawesomeIcon } from "../helpers/font-awesome.helper";
-import POSTMapForm from "./forms/MapForm";
+import MapForm from "./forms/MapForm";
 type MapFormButtonProps = {
     authToken: string
     groupId: string,
@@ -63,7 +63,14 @@ const NewMapGroupItem = (props: MapFormButtonProps) => {
                 onRequestClose={closeWindow}
                 contentLabel='New Map'
             >
-                <POSTMapForm authToken={props.authToken}></POSTMapForm>
+                <MapForm 
+                    authToken={props.authToken} 
+                    groupName={props.groupName} 
+                    afterSubmit={() => {
+                        props.afterClose();
+                        setIsOpen(false);
+                        }}>
+                </MapForm>
             </Modal>
         </>
     )

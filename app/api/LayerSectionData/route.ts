@@ -49,6 +49,12 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+    if(!Auth(request)){ //protected endpoint
+        return NextResponse.json({
+            message: "Not Authorized",
+            error: "Auth Token Invaild",
+        }, {status: 401});
+      }
     const LayerSectionData = await request.json()
     const prisma = new PrismaClient();
     try {

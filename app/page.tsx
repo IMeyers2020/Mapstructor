@@ -33,10 +33,7 @@ import {
   LayerSection as PrismaLayerSection,
   LayerData as PrismaLayer,
   LayerGroup as PrismaLayerGroup,
-  MapFilterGroup as PrismaMapFilterGroup,
-  MapFilterItem as PrismaMapFilterItem,
-  MapFilterItem,
-  LayerSection,
+  MapGroup as PrismaMapGroup,
   hoverItem,
   LayerData,
 } from "@prisma/client";
@@ -85,9 +82,7 @@ export default function Home() {
   const [activeLayerIds, setActiveLayerIds] = useState<string[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [mappedFilterItemGroups, setMappedFilterItemGroups] = useState<
-    MapFiltersGroup[]
-  >([]);
+  const [mappedFilterItemGroups, setMappedFilterItemGroups] = useState<MapFiltersGroup[]>([]);
   const [currMaps, setCurrMaps] = useState<PrismaMap[]>([]);
   const [currLayers, setCurrLayers] = useState<PrismaLayer[]>([]);
   const [defaultBeforeMap, setDefaultBeforeMap] = useState<mapboxgl.Map>();
@@ -111,7 +106,6 @@ export default function Home() {
   const [inPreviewMode, setInPreviewMode] = useState<boolean>(false);
 
   const moveLayerUp = (l1: PrismaLayer) => {
-    console.log(currAfterMap?.current.getStyle()?.layers);
 
     let beforeIndex = layerOrder.findIndex((e) => e.id == l1.id) - 1;
     console.log(beforeIndex);
@@ -274,9 +268,10 @@ export default function Home() {
   useEffect(() => {
     if (!hasDoneInitialZoom && hashParams.length > 0) {
       setBeforeMapItem({
-        name: "1660 Original Castello Plan",
-        mapId: "cjooubzup2kx52sqdf9zmmv2j",
-        styleId: "cjooubzup2kx52sqdf9zmmv2j",
+        id: "0",
+        name: "Current Satellite",
+        mapId: "clm2yrx1y025401p93v26bhyl",
+        styleId: "clm2yrx1y025401p93v26bhyl",
         groupId: "",
         zoom: +(hashParams?.at(0) ?? 15.09),
         center: [
@@ -434,7 +429,7 @@ export default function Home() {
           "circle-stroke-color":
             parsedPaint["circle-stroke-color"] ?? "#000000",
           "circle-stroke-width": parsedPaint["circle-stroke-width"] ?? 1,
-          "circle-stroke-opacity": [
+          "circle-stroke-opacity": parsedPaint["circle-stroke-opacity"] ?? [
             "interpolate",
             ["linear"],
             ["zoom"],
@@ -456,51 +451,51 @@ export default function Home() {
           "line-opacity": parsedPaint["line-opacity"] ?? 1.0,
         };
       }
-      if (layerConfig.type === "circle" && layerConfig.iconImage) {
-        const imageKey = `icon_image_${layerConfig.id}`;
+      // if (layerConfig.type === "circle" && layerConfig.iconImage) {
+      //   const imageKey = `icon_image_${layerConfig.id}`;
 
-        // Ensure the image is loaded into the `beforeMap`
-        if (!beforeMap.current?.hasImage(imageKey)) {
-          beforeMap.current?.loadImage(layerConfig.iconImage, (err, image) => {
-            if (err) throw err;
-            beforeMap.current?.addImage(imageKey, image!);
-          });
-        }
+      //   // Ensure the image is loaded into the `beforeMap`
+      //   if (!beforeMap.current?.hasImage(imageKey)) {
+      //     beforeMap.current?.loadImage(layerConfig.iconImage, (err, image) => {
+      //       if (err) throw err;
+      //       beforeMap.current?.addImage(imageKey, image!);
+      //     });
+      //   }
 
-        // Ensure the image is loaded into the `afterMap`
-        if (!afterMap.current?.hasImage(imageKey)) {
-          afterMap.current?.loadImage(layerConfig.iconImage, (err, image) => {
-            if (err) throw err;
-            afterMap.current?.addImage(imageKey, image!);
-          });
-        }
+      //   // Ensure the image is loaded into the `afterMap`
+      //   if (!afterMap.current?.hasImage(imageKey)) {
+      //     afterMap.current?.loadImage(layerConfig.iconImage, (err, image) => {
+      //       if (err) throw err;
+      //       afterMap.current?.addImage(imageKey, image!);
+      //     });
+      //   }
 
-        // Add the `symbol` layer to both maps
-        // const symbolLayer = {
-        //   id: `${layerConfig.id}-symbol`,
-        //   type: "symbol",
-        //   source: {
-        //     type: "vector",
-        //     url: layerConfig.sourceUrl,
-        //   },
-        //   "source-layer": layerConfig.sourceLayer,
-        //   layout: {
-        //     "icon-image": imageKey,
-        //     "icon-size": 0.5,
-        //     "icon-allow-overlap": true,
-        //   },
-        // };
+      //   // Add the `symbol` layer to both maps
+      //   // const symbolLayer = {
+      //   //   id: `${layerConfig.id}-symbol`,
+      //   //   type: "symbol",
+      //   //   source: {
+      //   //     type: "vector",
+      //   //     url: layerConfig.sourceUrl,
+      //   //   },
+      //   //   "source-layer": layerConfig.sourceLayer,
+      //   //   layout: {
+      //   //     "icon-image": imageKey,
+      //   //     "icon-size": 0.5,
+      //   //     "icon-allow-overlap": true,
+      //   //   },
+      //   // };
 
-        // if (!beforeMap.current?.getLayer(symbolLayer.id)) {
-        //   beforeMap.current?.addLayer(symbolLayer as any);
-        // }
+      //   // if (!beforeMap.current?.getLayer(symbolLayer.id)) {
+      //   //   beforeMap.current?.addLayer(symbolLayer as any);
+      //   // }
 
-        // if (!afterMap.current?.getLayer(symbolLayer.id)) {
-        //   afterMap.current?.addLayer(symbolLayer as any);
-        // }
+      //   // if (!afterMap.current?.getLayer(symbolLayer.id)) {
+      //   //   afterMap.current?.addLayer(symbolLayer as any);
+      //   // }
 
-        // return; // Exit early for this custom case
-      }
+      //   // return; // Exit early for this custom case
+      // }
 
       const layerStuff = {
         id: layerConfig.id,
@@ -510,7 +505,7 @@ export default function Home() {
           url: layerConfig.sourceUrl,
         },
         layout: {
-          visibility: "visible",
+          visibility: "none",
           ...layout,
         },
         "source-layer": layerConfig.sourceLayer,
@@ -832,7 +827,7 @@ export default function Home() {
 
   const addAllMapLayers = () => {
     if (currLayers !== null) {
-      let tempLayerOrder = [];
+      let tempLayerOrder: PrismaLayer[] = [];
       currLayers.forEach((x: PrismaLayer) => {
         addMapLayer(currBeforeMap, currAfterMap, x);
         tempLayerOrder.push(x);
@@ -1002,9 +997,10 @@ export default function Home() {
       });
     });
 
-    fetch("http://localhost:3000/api/LayerData", {
+    fetch("/api/LayerData", {
       method: "GET",
       headers: {
+        authorization: currAuthToken ?? '',
         "Content-Type": "application/json",
       },
     }).then((layerResponse) => {
@@ -1018,7 +1014,7 @@ export default function Home() {
   };
 
   const getMaps = () => {
-    fetch("/api/map", {
+    fetch("/api/MapGroup", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -1029,18 +1025,18 @@ export default function Home() {
           .json()
           ?.then((parsed) => {
             if (!!parsed && !!parsed.groups && parsed.groups.length) {
-              let groups: PrismaMapFilterGroup[] = parsed.groups;
+              let groups: PrismaMapGroup[] = parsed.groups;
               let mapFilterGroups: MapFiltersGroup[] = groups.map(
                 (grp, idx) => {
                   let mappedGroup: MapFiltersGroup = {
-                    id: idx,
+                    id: grp.id,
                     name: grp.groupName,
                     label: grp.label,
-                    groupId: grp.groupId,
                     maps: (grp as any).maps.map((x: PrismaMap) => {
                       let newDBMap: MapItem = {
+                        id: x.id,
                         mapId: x.mapId,
-                        groupId: grp.groupId,
+                        groupId: x.groupId,
                         center: [x.longitude, x.latitude],
                         zoom: x.zoom,
                         bearing: x.bearing,
@@ -1050,26 +1046,7 @@ export default function Home() {
                       };
                       return newDBMap;
                     }),
-                    mapfilteritems: (grp as any).mapfilteritems.map(
-                      (x: PrismaMapFilterItem) => {
-                        let filterItem: MapFilterItem = {
-                          id: x.id,
-                          groupId: grp.groupId,
-                          label: x.label,
-                          itemId: x.itemId,
-                          itemName: x.itemName,
-                          defaultCheckedForBeforeMap:
-                            x.defaultCheckedForBeforeMap,
-                          defaultCheckedForAfterMap:
-                            x.defaultCheckedForAfterMap,
-                          showInfoButton: x.showInfoButton,
-                          showZoomButton: x.showZoomButton,
-                        };
-                        return filterItem;
-                      }
-                    ),
                   };
-
                   return mappedGroup;
                 }
               );
@@ -1553,7 +1530,7 @@ export default function Home() {
                 />
               );
             })}
-            {!groupFormOpen && !inPreviewMode && (
+            {!groupFormOpen && !inPreviewMode && (currAuthToken != null && currAuthToken.length > 0) && (
               <div
                 style={{
                   paddingTop: "5px",
@@ -1573,7 +1550,19 @@ export default function Home() {
                 </button>
               </div>
             )}
-            {!inPreviewMode && (
+            {groupFormOpen && (
+              <NewLayerSectionForm
+                authToken={currAuthToken}
+                afterSubmit={() => {
+                  setGroupFormOpen(false);
+                  getLayerSections();
+                }}
+                afterCancel={() => {
+                  setGroupFormOpen(false);
+                }}
+              ></NewLayerSectionForm>
+            )}
+            {!inPreviewMode && (currAuthToken != null && currAuthToken.length > 0) && (
               <>
                 <p className="title">Layer Ordering</p>
 
@@ -1597,7 +1586,7 @@ export default function Home() {
                       style={{ display: "flex" }}
                     >
                       <FontAwesomeIcon
-                        className="up"
+                        className="decrement-order"
                         title="up"
                         color="black"
                         icon={getFontawesomeIcon(
@@ -1608,7 +1597,7 @@ export default function Home() {
                       />
 
                       <FontAwesomeIcon
-                        className="down"
+                        className="increment-order"
                         title="down"
                         color="black"
                         icon={getFontawesomeIcon(
@@ -1632,18 +1621,6 @@ export default function Home() {
                     </div>
                   ))}
               </>
-            )}
-            {groupFormOpen && (
-              <NewLayerSectionForm
-                authToken={currAuthToken}
-                afterSubmit={() => {
-                  setGroupFormOpen(false);
-                  getLayerSections();
-                }}
-                afterCancel={() => {
-                  setGroupFormOpen(false);
-                }}
-              ></NewLayerSectionForm>
             )}
             <br />
             <p className="title"></p>

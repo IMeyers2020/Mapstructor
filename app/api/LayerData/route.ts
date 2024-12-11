@@ -55,7 +55,9 @@ export async function POST(request: Request) {
                 clickHeader:layerData.clickHeader,
                 hoverContent:layerData.hoverContent,
                 order:idx + 1,
-                viewOrder:viewIdx + 1
+                viewOrder:viewIdx + 1,
+                
+                
             }
         })
         return NextResponse.json({

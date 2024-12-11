@@ -77,7 +77,7 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
                 })
             }
         }
-    }, [])
+    })
 
     useEffect(() => {
         console.log(modalHeaderText, modalBodyText)
@@ -117,7 +117,11 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
         setIsLoading(true);
         try {
             await fetch('/api/LayerGroup/Rearrange/Up/' + id, {
-                method: 'PUT'
+                method: 'PUT',
+                headers: {
+                    authorization: props.authToken,
+                    "Content-Type": "application/json",
+                  },
             });
         }
         catch(err) {
@@ -132,7 +136,11 @@ const SectionLayerGroupComponent = (props: SectionLayerGroupsProps) => {
         setIsLoading(true);
         try {
             await fetch('/api/LayerGroup/Rearrange/Down/' + id, {
-                method: 'PUT'
+                method: 'PUT',
+                headers: {
+                    authorization: props.authToken,
+                    "Content-Type": "application/json",
+                  },
             });
         }
         catch(err) {

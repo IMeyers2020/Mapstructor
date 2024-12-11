@@ -10,6 +10,7 @@ import ButtonLinkForm from "../forms/ButtonLinkForm";
 import ButtonLinkButton from "../forms/buttons/button-link-button.component";
 import { useEffect, useState } from "react";
 import { ButtonLink } from "@/app/models/button-link.model";
+import NewMapGroupForm from "../forms/NewMapGroupForm";
 
 export type MapFilterWrapperProps = {
   defaultMap: MapItem;
@@ -27,6 +28,7 @@ export type MapFilterWrapperProps = {
 const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {
   const [showForm, setShowForm] = useState(false);
   const [buttonLinks, setButtonLinks] = useState<ButtonLink[]>([]);
+  const [groupFormOpen, setGroupFormOpen] = useState<boolean>(false);
   const [showEditorOptions, setShowEditorOptions] = useState<boolean>(false);
 
   useEffect(() => {
@@ -113,8 +115,14 @@ const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {
           beforeMapCallback={props.beforeMapCallback}
           afterMapCallback={props.afterMapCallback}
           map={props.defaultMap}
-          displayZoomButton={false}
+          beforeOpen={props.beforeOpen}
+          displayZoomButton
           displayInfoButton
+          displayEditButton={false}
+          fetchMapCallback={() => {}} // Do nothing
+          mapEditFormCallback={() => {}} // Do nothing
+          authToken={props.authToken}
+          showEditorOptions={showEditorOptions}
         ></MapFilterComponent>
         <div id="maps-group">
           {props.mapGroups.map((m, idx) => (
@@ -128,9 +136,42 @@ const MapFilterWrapperComponent = (props: MapFilterWrapperProps) => {
               beforeMapCallback={props.beforeMapCallback}
               afterMapCallback={props.afterMapCallback}
               group={m}
+              showEditorOptions={showEditorOptions}
             ></MapFiltersGroupComponent>
           ))}
         </div>
+        {!groupFormOpen && props.authToken !== "" && (
+              <div
+                style={{
+                  paddingTop: "5px",
+                  paddingLeft: "15px",
+                  paddingRight: "10px",
+                  textAlign: "center",
+                }}
+              >
+                <button id="post-button" onClick={() => setGroupFormOpen(true)}>
+                  <FontAwesomeIcon
+                    icon={getFontawesomeIcon(
+                      FontAwesomeLayerIcons.PLUS_SQUARE,
+                      true
+                    )}
+                  ></FontAwesomeIcon>{" "}
+                  New Group Folder
+                </button>
+              </div>
+            )}
+            {groupFormOpen && (
+              <NewMapGroupForm
+                authToken={props.authToken}
+                afterSubmit={() => {
+                  props.afterClose();
+                  setGroupFormOpen(false);
+                }}
+                afterCancel={() => {
+                  setGroupFormOpen(false);
+                }}
+              ></NewMapGroupForm>
+            )}
         <center
           style={{
             marginTop: "15px",

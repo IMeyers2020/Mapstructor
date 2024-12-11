@@ -52,7 +52,11 @@ const SectionLayerGroupItemComponent = (props: SectionLayerGroupItemProps) => {
     const UpLayerData = async (id: string) => {
         try {
             await fetch('/api/LayerData/Rearrange/Up/' + id, {
-                method: 'PUT'
+                method: 'PUT',
+                headers: {
+                    authorization: props.authToken,
+                    "Content-Type": "application/json",
+                  },
             });
         }
         catch(err) {
@@ -63,7 +67,11 @@ const SectionLayerGroupItemComponent = (props: SectionLayerGroupItemProps) => {
     const DownLayerData = async (id: string) => {
         try {
             await fetch('/api/LayerData/Rearrange/Down/' + id, {
-                method: 'PUT'
+                method: 'PUT',
+                headers: {
+                    authorization: props.authToken,
+                    "Content-Type": "application/json",
+                  },
             });
         }
         catch(err) {
@@ -154,14 +162,6 @@ const SectionLayerGroupItemComponent = (props: SectionLayerGroupItemProps) => {
                                     duration: 2500,
                                 })
                             }}
-                            />
-                        </div>
-                        <div className="tooltip-container" data-title="Layer Info">
-                            <FontAwesomeIcon
-                            className="layer-info trigger-popup"
-                            color="grey"
-                            icon={getFontawesomeIcon(FontAwesomeLayerIcons.INFO_CIRCLE)}
-                            onClick={() => {}/*zoomtocenter(layerData.zoomTo || "N/A")*/} // Edit This to pull up a modal
                             />
                         </div>
                     </div>

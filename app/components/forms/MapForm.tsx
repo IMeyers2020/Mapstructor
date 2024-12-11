@@ -1,166 +1,112 @@
 import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { CSSProperties } from 'react';
-import { MapFilterGroup as PrismaMapFilterGroup } from '@prisma/client';
+import { Map as PrismaMap } from '@prisma/client';
 
-type POSTMapFormProps = {
-  authToken: string
+
+type MapFormProps = {
+  authToken: string,
+  mapConfig?: PrismaMap,
+  groupName: string,
+  afterSubmit: () => void,
 }
-const POSTMapForm = (props: POSTMapFormProps) => {
-  const [responseMessage, setResponseMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [showGroupSettings, setShowGroupSettings] = useState(false);
-  const [existingGroups, setExistingGroups] = useState<PrismaMapFilterGroup[]>([]);
+const MapForm = (props: MapFormProps) => {
+  const [submitType, setSubmitType] = useState<"POST" | "UPDATE" | "DELETE">();
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      name:                    undefined,
-      longitude:               0,
-      latitude:                0,
-      mapId:                   undefined,
-      itemId:                  undefined,
-      itemName:                undefined,
-      itemLabel:               undefined,
-      groupid:                 undefined,
-      zoom:                    0,
-      bearing:                 0,
-      styleId:                 undefined,
-      groupValue:              undefined,
-      newGroupName:            undefined,
-      newGroupLabel:           undefined,
-      infoId:                  ''
+      longitude:               props.mapConfig?.longitude ?? 0,
+      latitude:                props.mapConfig?.latitude ?? 0,
+      mapId:                   props.mapConfig?.mapId ?? '',
+      mapName:                 props.mapConfig?.mapName ?? '',
+      groupId:                 props.groupName,
+      zoom:                    props.mapConfig?.zoom ?? 0,
+      bearing:                 props.mapConfig?.bearing ?? 0,
+      styleId:                 props.mapConfig?.styleId ?? '',
+      infoId:                  props.mapConfig?.infoId ?? '',
     },
     
     onSubmit: async (values) => {
-
-      let map;
-      let item;
-
-      if(values.mapId){ //to add more maps then appen to map and make struct or some idk
-        map = [{
-          longitude: values.longitude,
-          groupId: `unique-map-id-${values.newGroupName}-${values.name}`,
-          latitude: values.latitude,
-          mapName: values.name,
-          mapId: values.mapId,
-          zoom: values.zoom,
-          bearing: values.bearing,
-          styleId: values.styleId,
-          infoId: values.infoId
-        }]
-      }
-      if(values.itemId){
-        item = [{
-          itemName: values.itemName, 
-          groupId: `unique-map-id-${values.newGroupName}-${values.name}`,
-          label: values.itemLabel, 
-          itemId: values.itemId, 
-          defaultCheckedForBeforeMap: true, //change
-          defaultCheckedForAfterMap: false, //change
-          showInfoButton: true, //change
-          showZoomButton: false //change
-        }]
-      }
-
-      try {
-        // If we are creating a new group, need to hit a different endpoint
-
-        if(values.groupValue === 'newGroup') {
-          const serializedBody = {
-            groupName: values.newGroupName,
-            label: values.newGroupLabel,
-            groupId: `unique-map-id-${values.newGroupName}-${values.name}`,
-            mapfilteritems: item,
-            maps: map
-          }
-
-          const response = await fetch('api/map', {
-            method: 'POST',
-            headers: {
-              'authorization': props.authToken ?? '',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(serializedBody),
-          });
-
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-
-          const data = await response.json();
-          setResponseMessage(`Success - map ID: ${data.message}`); 
-          formik.resetForm(); 
-        } 
-        
-        else {//fix to send whole group to be updated
-
-          const serializedBody = {
-            mapName: values.name,
-            groupId: values.groupValue,
-            longitude: values.longitude,
-            latitude: values.latitude,
-            mapId: values.mapId,
-            zoom: values.zoom,
-            bearing: values.bearing,
-            styleId: values.styleId,
-            itemName: values.itemName, 
-            label: values.itemLabel, 
-            itemId: values.itemId, 
-            defaultCheckedForBeforeMap: true, //change
-            defaultCheckedForAfterMap: false, //change
-            showInfoButton: true, //change
-            showZoomButton: false, //change
-            infoId: values.infoId
-          }
-
-          const response = await fetch('api/map', {
-            method: 'PUT',
-            headers: {
-              'authorization': props.authToken ?? '',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(serializedBody),
-          });
-
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-
-          const data = await response.json();
-          setResponseMessage(`Success - map ID: ${data.message}`); 
-          formik.resetForm(); 
+      if(values.mapName?.length > 0) {
+        if(submitType === "POST")
+            {
+              try 
+              {
+                await fetch('api/map', {
+                  method: 'POST',
+                  headers: {
+                    'authorization': props.authToken ?? '',
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(values),
+                });
+                alert('Map added successfully');
+                formik.resetForm();
+                props.afterSubmit();
+              } 
+              catch (error: any) 
+              {
+                alert(`Error: ${error.message}`);
+              }
+            }
+            else if(submitType === "UPDATE")
+            {
+              if(props.mapConfig)
+              {
+                try
+                {
+                  await fetch('/api/map/' + props.mapConfig.id, {
+                    method: 'PUT',
+                    headers: {
+                        'authorization': props.authToken,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(values)
+                  });
+                  alert(`Map Updated`);
+                  props.afterSubmit();
+                }
+                catch (error: any)
+                {
+                  alert(`Error: ${error.message}`);
+                }
+              }
+              else
+              {
+                alert(`Error: mapGroup unpopulated`);
+              }
+            }
+            else if(submitType === "DELETE")
+            {
+              if(props.mapConfig)
+                {
+                  try
+                  {
+                    await fetch('/api/map/' + props.mapConfig.id, {
+                      method: 'DELETE',
+                      headers: {
+                        'authorization': props.authToken,
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(values)
+                    });
+                    alert(`Map Deleted`);
+                    props.afterSubmit();
+                  }
+                  catch (error: any)
+                  {
+                    alert(`Error: ${error.message}`);
+                  }
+                }
+                else
+                {
+                  alert(`Error: mapGroup unpopulated`);
+                }
+            }
         }
-      } catch (error) {
-        setErrorMessage(`Error: ${error}`);
-        setResponseMessage('');
-      }
     },
   });
-
-  const getMaps = () => {
-    fetch('/api/map', {
-      method: 'GET',
-      headers: {
-          'Content-Type': 'application/json',
-      }
-    }).then(maps => {
-        maps.json()?.then(parsed => {
-          if(!!parsed && !!parsed.groups && parsed.groups.length) {
-            let groups: PrismaMapFilterGroup[] = parsed.groups;
-
-            setExistingGroups(groups)
-          }
-        }).catch(err => {
-          console.error('failed to convert to json: ', err)
-        })
-    }).catch(err => {
-      console.error(err);
-    })
-  }
-
-  useEffect(() => {
-    getMaps();
-  }, [])
 
   const boxStyling: CSSProperties = {
     padding: '8px',
@@ -197,11 +143,19 @@ const buttonHoverStyling: CSSProperties = {
 
 return (
     <form onSubmit={formik.handleSubmit} style={{ maxWidth: '400px', margin: '0 auto' }}>
-        <h2 style={{ paddingBottom: '8px', color: '#333', textAlign: 'center' }}><strong>Add New Map</strong></h2>
+      <h2
+          style={{ paddingBottom: "8px", color: "#333", textAlign: "center" }}
+        >
+          {props.mapConfig ? (
+              <strong>Edit {props.mapConfig.mapName}</strong>
+            ) : (
+              <strong>Add New Map</strong>
+            )}
+        </h2>
         
         <div style={{ marginBottom: '15px' }}>
-            <label htmlFor="name" style={labelStyling}>Name:</label>
-            <input type="text" id="name" name="name" onChange={formik.handleChange} value={formik.values.name} style={boxStyling} />
+            <label htmlFor="mapName" style={labelStyling}>Name:</label>
+            <input type="text" id="mapName" name="mapName" onChange={formik.handleChange} value={formik.values.mapName} style={boxStyling} />
         </div>
         
         <div style={{ marginBottom: '15px' }}>
@@ -238,69 +192,76 @@ return (
             <label htmlFor="infoId" style={labelStyling}>Drupal Info Id:</label>
             <input type="text" id="infoId" name="infoId" onChange={formik.handleChange} value={formik.values.infoId} style={boxStyling} />
         </div>
-
-
-        <div style={{ marginBottom: '15px' }}>
-            <label htmlFor="itemId" style={labelStyling}>Item ID:</label>
-            <input type="text" id="itemId" name="itemId" onChange={formik.handleChange} value={formik.values.itemId} style={boxStyling} />
-        </div>
-
-        <div style={{ marginBottom: '15px' }}>
-            <label htmlFor="itemName" style={labelStyling}>Item name:</label>
-            <input type="text" id="itemName" name="itemName" onChange={formik.handleChange} value={formik.values.itemName} style={boxStyling} />
-        </div>
-
-        <div style={{ marginBottom: '15px' }}>
-            <label htmlFor="itemLabel" style={labelStyling}>Item label:</label>
-            <input type="text" id="itemLabel" name="itemLabel" onChange={formik.handleChange} value={formik.values.itemLabel} style={boxStyling} />
-        </div>
-
-
-
-              {/* Dropdown for Type */}
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="groupValue" style={labelStyling}>Group:</label>
-          <select
-            id="groupValue"
-            name="groupValue"
-            onChange={formik.handleChange}
-            value={formik.values.groupValue ?? ''}
-            style={boxStyling}
-          >
-            <option value="">Select Type</option>
-            <option value="newGroup">Create New Group</ option>
-            {
-              (existingGroups ?? []).map(grp => (
-                <>
-                  <option key={grp.groupId} value={grp.groupId}>{grp.groupName}</ option>
-                </>
-              ))
-            }
-          </select>
-        </div>
-
-      {
-        ((formik.values.groupValue ?? undefined) === 'newGroup') && (
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        {props.mapConfig ? (
           <>
-            <div style={{ marginBottom: '15px' }}>
-              <label htmlFor="newGroupName" style={labelStyling}>New Group Name:</label>
-              <input type="text" id="newGroupName" name="newGroupName" onChange={formik.handleChange} value={formik.values.newGroupName} style={boxStyling} />
-            </div>
-            <div style={{ marginBottom: '15px' }}>
-              <label htmlFor="newGroupLabel" style={labelStyling}>New Group Label:</label>
-              <input type="text" id="newGroupLabel" name="newGroupLabel" onChange={formik.handleChange} value={formik.values.newGroupLabel} style={boxStyling} />
-            </div>
-          </>
-        )
-      }
-        
-        <button style={buttonStyling} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = buttonHoverStyling.backgroundColor!}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = buttonStyling.backgroundColor!}
-            type="submit">
-            Submit
-        </button>
+          <button
+            style={buttonStyling}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor =
+                buttonHoverStyling.backgroundColor!)
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor =
+                buttonStyling.backgroundColor!)
+            }
+            onClick={async (e) => {
+              e.preventDefault();
+              setSubmitType("UPDATE");
+              await formik.submitForm();
+            }}
+          >
+            Update
+          </button>
+          <button
+            style={{
+              backgroundColor: "#a40000",
+              color: "white",
+              padding: "10px 15px",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontFamily: "Arial, sans-serif",
+              fontSize: "14px",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#850000")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "#a40000")
+            }
+            onClick={async (e) => {
+              e.preventDefault();
+              setSubmitType("DELETE");
+              await formik.submitForm();
+            }}
+          >
+            Delete Map
+          </button>
+        </>
+        ) : (
+          <button
+                style={buttonStyling}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor =
+                    buttonHoverStyling.backgroundColor!)
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor =
+                    buttonStyling.backgroundColor!)
+                }
+                onClick={async (e) => {
+                  e.preventDefault();
+                  setSubmitType("POST");
+                  await formik.submitForm();
+                }}
+              >
+                Submit
+              </button>
+        )}
+        </div>
     </form>
 );
 };
 
-export default POSTMapForm;
+export default MapForm;

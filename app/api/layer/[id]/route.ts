@@ -17,13 +17,13 @@ export async function GET(request: Request, context: any) {
 }
 
 
-export async function DELETE(context: any) {
-    if(!Auth(context)){ //protected endpoint
+export async function DELETE(request: Request, context: any) {
+    if(!Auth(request)){ //protected endpoint
         return NextResponse.json({
             message: "Not Authorized",
             error: "Auth Token Invaild",
         }, {status: 401});
-    }
+      }
     const {params} = context;
     const prisma = new PrismaClient();
     const layer = await (prisma as any).layer.findFirst({
@@ -45,6 +45,12 @@ export async function DELETE(context: any) {
 
 
 export async function PUT(request: Request, context: any) {
+    if(!Auth(context)){ //protected endpoint
+        return NextResponse.json({
+            message: "Not Authorized",
+            error: "Auth Token Invaild",
+        }, {status: 401});
+    }
     const { params } = context;
     const Layer = await request.json()
     const prisma = new PrismaClient();

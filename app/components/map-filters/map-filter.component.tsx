@@ -10,10 +10,16 @@ type MapFilterComponentProps = {
     map: MapItem,
     displayZoomButton: boolean,
     displayInfoButton: boolean,
+    displayEditButton: boolean,
     beforeMapCallback: (map: MapItem) => void,
     afterMapCallback: (map: MapItem) => void,
     mapZoomCallback: (zoomProps: MapZoomProps) => void,
-    afterClose: () => void
+    beforeOpen: () => void,
+    afterClose: () => void,
+    mapEditFormCallback: (visible: boolean) => void,
+    fetchMapCallback: (id: string) => void,
+    authToken: string,
+    showEditorOptions: boolean,
 }
 
 const MapFilterComponent = (props: MapFilterComponentProps) => {
@@ -49,7 +55,7 @@ const MapFilterComponent = (props: MapFilterComponentProps) => {
                 })
             }
         }
-    }, [])
+    })
 
     useEffect(() => {
         console.log(modalHeaderText, modalBodyText)
@@ -82,7 +88,25 @@ const MapFilterComponent = (props: MapFilterComponentProps) => {
                     <div className="dummy-label-layer-space"></div></label>
                 <div className="layer-buttons-block">
                     <div className="layer-buttons-list">
-                        {
+                            {
+                                props.showEditorOptions && props.displayEditButton && (
+                                    <div className="tooltip-container" data-title="Edit Map">
+                                        <FontAwesomeIcon
+                                            className="edit-button"
+                                            color="black"
+                                            icon={getFontawesomeIcon(FontAwesomeLayerIcons.PEN_TO_SQUARE)}
+                                            onClick={() => {
+                                                props.beforeOpen();
+                                                props.fetchMapCallback(props.map.id ?? "");
+                                                props.mapEditFormCallback(true);
+                                            }}
+                                            style={{
+                                                paddingLeft: "10px"
+                                            }}/>
+                                        </div>
+                                    )
+                                }
+                            {
                             props.displayZoomButton &&
                             (
                                 <div className="tooltip-container" data-title="Zoom to Map">

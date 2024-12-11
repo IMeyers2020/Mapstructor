@@ -131,7 +131,11 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
         setIsLoading(true);
         try {
             await fetch('/api/LayerSection/Rearrange/Up/' + id, {
-                method: 'PUT'
+                method: 'PUT',
+                headers: {
+                    authorization: props.authToken,
+                    "Content-Type": "application/json",
+                  },
             });
         }
         catch(err) {
@@ -146,7 +150,11 @@ const SectionLayerComponent = (props: SectionLayerProps) => {
         setIsLoading(true);
         try {
             await fetch('/api/LayerSection/Rearrange/Down/' + id, {
-                method: 'PUT'
+                method: 'PUT',
+                headers: {
+                    authorization: props.authToken,
+                    "Content-Type": "application/json",
+                  },
             });
         }
         catch(err) {

@@ -2,12 +2,20 @@ import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { User } from "@prisma/client";
+import { Auth } from "../auth";
 
 const prisma = new PrismaClient();
-const crypto = require('crypto');
 
 // Register 
 export async function POST(request: Request) {
+
+    if(!Auth(request)){ //protected endpoint
+        return NextResponse.json({
+            message: "Not Authorized",
+            error: "Auth Token Invaild",
+        }, {status: 401});
+      }
+      
     const user: User = await request.json();
 
     if (!user.username || !user.password) { //check username and password
@@ -31,12 +39,9 @@ export async function POST(request: Request) {
                 { status: 400 }
             );
         }
-
-        //decryt password
-       let decrypted = decryted(user.password);
         
         // Hash the password
-        const hashedPassword = await bcrypt.hash(decrypted, 10);
+        const hashedPassword = await bcrypt.hash(user.password, 10);
 
         
         await prisma.user.create({// add the user in the database
@@ -57,17 +62,4 @@ export async function POST(request: Request) {
             { status: 500 }
         );
     }
-}
-
-
-function decryted(password : string){
-    let algorithm = process.env.ALGORITHM as string;
-    let key = process.env.KEY as string;
-    let iv = process.env.IV as string;
-
-    let decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(iv, 'hex'));
-    let decrypted = decipher.update(password, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-
-    return decrypted as string;
 }

@@ -41,13 +41,14 @@ type LayerFormProps = {
 export default function LayerForm(props: LayerFormProps) {
   const [submitType, setSubmitType] = useState<"POST" | "UPDATE" | "DELETE">();
 
+  const parsedPaint = props.layerConfig?.paint ? JSON.parse(props.layerConfig.paint) : {};
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
       name: props.layerConfig?.name ?? "",
-      iconColor: props.layerConfig?.iconColor ?? "",
+      iconColor: props.layerConfig?.iconColor ?? "#000000",
       iconType: props.layerConfig?.iconType ?? "",
-      iconImage: props.layerConfig?.layout?.["icon-image"] ?? "default-icon",
       label: props.layerConfig?.label ?? "",
       longitude: props.layerConfig?.longitude ?? 0,
       latitude: props.layerConfig?.latitude ?? 0,
@@ -56,10 +57,7 @@ export default function LayerForm(props: LayerFormProps) {
       topLayerClass: props.groupName,
       infoId: props.layerConfig?.infoId ?? "",
       type: props.layerConfig?.type ?? ("" as LayerType),
-      sourceType:
-        props.layerConfig?.sourceType === "geojson"
-          ? props.layerConfig?.source?.data ?? "" // Use `data` for GeoJSON
-          : props.layerConfig?.source?.url ?? "", // Use `url` for other source types
+      sourceType: props.layerConfig?.sourceType ?? "",
       sourceUrl: props.layerConfig?.sourceUrl ?? "",
       sourceId: props.layerConfig?.sourceId ?? "",
       paint: props.layerConfig?.paint ?? "",
@@ -73,21 +71,21 @@ export default function LayerForm(props: LayerFormProps) {
       hoverContent: props.layerConfig?.hoverContent ?? [
         { label: "", type: "" },
       ],
-      fillColor: "#e3ed58",
-      fillOpacity: 0.5,
-      fillOutlineColor: "#FF0000",
+      fillColor: parsedPaint["fill-color"] ?? "#e3ed58",
+      fillOpacity: 0.5, //parsedPaint["fill-opacity"][4][2] ??
+      fillOutlineColor: parsedPaint["fill-outline-color"] ?? "#FF0000",
       textColor: "#000080",
       textHaloColor: "#ffffff",
       textHaloWidth: 2,
-      circleColor: "#097911", // Default values
-      circleOpacity: 1,
-      circleRadius: 5,
-      circleStrokeColor: "#0000ee",
-      circleStrokeWidth: 2,
-      lineColor: "#ff9900",
+      circleColor: parsedPaint["circle-color"] ?? "#097911", // Default values
+      circleOpacity: 1, //parsedPaint["circle-opacity"][4][2] ?? 
+      circleRadius: 5, //parsedPaint["circle-radius"] ?? 
+      circleStrokeColor: parsedPaint["circle-stroke-color"] ?? "#0000ee",
+      circleStrokeWidth: parsedPaint["circle-stroke-width"] ?? 2,
+      lineColor: parsedPaint["line-color"] ?? "#ff9900",
       lineWidth: 5,
-      lineBlur: 0,
-      lineOpacity: 1.0,
+      lineBlur: parsedPaint["line-blur"] ?? 0,
+      lineOpacity: parsedPaint["line-opacity"] ?? 1.0,
       textSizeDefault: 12, // Default text size
       useTextSizeZoomStyling: false, // Whether to use zoom-based text size
       useIconSizeZoomStyling: false, // Whether to use zoom-based icon size
@@ -122,32 +120,32 @@ export default function LayerForm(props: LayerFormProps) {
       layout: {
         "text-field": "{name}",
         "text-size":
-          props.layerConfig?.layout?.["text-size"] ??
-          (props.layerConfig?.textZoomLevels?.length
+          (props.layerConfig?.layout as any)?.["text-size"] ??
+          ((props.layerConfig as any)?.textZoomLevels?.length
             ? [
                 "interpolate",
                 ["linear"],
                 ["zoom"],
-                ...props.layerConfig.textZoomLevels.flatMap((level) => [
+                ...(props.layerConfig as any).textZoomLevels.flatMap((level: any) => [
                   level.zoom,
                   level.value,
                 ]),
               ]
-            : props.layerConfig?.textSizeDefault ?? 12),
-        "icon-image": props.layerConfig?.layout?.["icon-image"] ?? "",
+            : (props.layerConfig as any)?.textSizeDefault ?? 12),
+        "icon-image": (props.layerConfig as any)?.layout?.["icon-image"] ?? "",
         "icon-size":
-          props.layerConfig?.layout?.["icon-size"] ??
-          (props.layerConfig?.zoomLevels?.length
+          (props.layerConfig as any)?.layout?.["icon-size"] ??
+          ((props.layerConfig as any)?.zoomLevels?.length
             ? [
                 "interpolate",
                 ["linear"],
                 ["zoom"],
-                ...props.layerConfig.zoomLevels.flatMap((level) => [
+                ...(props.layerConfig as any).zoomLevels.flatMap((level: any) => [
                   level.zoom,
                   level.value,
                 ]),
               ]
-            : props.layerConfig?.iconSizeDefault ?? 0.5),
+            : (props.layerConfig as any)?.iconSizeDefault ?? 0.5),
       },
     },
 
@@ -161,9 +159,12 @@ export default function LayerForm(props: LayerFormProps) {
           "interpolate",
           ["linear"],
           ["zoom"],
-          ...values.zoomLevels
-            .sort((a, b) => a.zoom - b.zoom)
-            .flatMap((level) => [level.zoom, level.value]),
+          ...values.zoomLevels.flatMap((level) => [level.zoom, [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            (level.value + 0.3 < 1 ? level.value + 0.3 : 1),
+            level.value
+          ]]),
         ];
         paint["fill-outline-color"] = values.fillOutlineColor ?? "#FF0000";
       } else if (values.type === "symbol") {
@@ -202,9 +203,12 @@ export default function LayerForm(props: LayerFormProps) {
           "interpolate",
           ["linear"],
           ["zoom"],
-          ...values.zoomLevels
-            .sort((a, b) => a.zoom - b.zoom) // Sort by ascending zoom levels
-            .flatMap((level) => [level.zoom, level.value]),
+          ...values.zoomLevels.flatMap((level) => [level.zoom, [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            0.5,
+            1,
+          ]]),
         ];
         paint["circle-radius"] = [
           "interpolate",
@@ -216,6 +220,29 @@ export default function LayerForm(props: LayerFormProps) {
         ];
         paint["circle-stroke-color"] = values.circleStrokeColor ?? "#000000";
         paint["circle-stroke-width"] = values.circleStrokeWidth ?? 1;
+        if(values.hover)
+        {
+          paint["circle-stroke-opacity"] = [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            ...values.zoomLevels.flatMap((level) => [level.zoom, [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              1,
+              0,
+            ]]),
+          ];
+        }
+        else
+        {
+          paint["circle-stroke-opacity"] = values.circleOpacity;
+        }
+
+        if (values.layout["icon-image"]) {
+          layout["icon-image"] = values.layout["icon-image"]; // Use the user-provided icon key or URL
+          layout["icon-size"] = 0.5; // Default icon size, can be dynamic
+        }
       } else if (values.type === "line") {
         paint["line-color"] = values.lineColor ?? "#ff9900";
         paint["line-width"] = [
@@ -267,7 +294,7 @@ export default function LayerForm(props: LayerFormProps) {
                 authorization: props.authToken,
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify(values),
+              body: JSON.stringify(layerData),
             });
             alert(`Layer Updated`);
             props.afterSubmit();
@@ -286,7 +313,7 @@ export default function LayerForm(props: LayerFormProps) {
                 authorization: props.authToken ?? "",
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify(values),
+              body: JSON.stringify(layerData),
             });
             alert(`Layer Deleted`);
             props.afterSubmit();
@@ -340,7 +367,6 @@ export default function LayerForm(props: LayerFormProps) {
     fontSize: "14px",
   };
 
-  const [selectedType, setSelectedType] = useState<string | null>(null);
 
   const buttonHoverStyling: CSSProperties = {
     backgroundColor: "#0056b3",
@@ -495,7 +521,6 @@ export default function LayerForm(props: LayerFormProps) {
             name="type"
             onChange={(e) => {
               formik.handleChange(e);
-              setSelectedType(e.target.value); // Set selected type
             }}
             value={formik.values.type}
             style={boxStyling}
@@ -518,7 +543,7 @@ export default function LayerForm(props: LayerFormProps) {
           </select>
         </div>
 
-        {selectedType === "fill" && (
+        {formik.values.type === "fill" && (
           <>
             <div style={{ marginBottom: "15px" }}>
               <label htmlFor="fillColor" style={labelStyling}>
@@ -535,7 +560,7 @@ export default function LayerForm(props: LayerFormProps) {
             </div>
             <div style={{ marginBottom: "15px" }}>
               <label htmlFor="fillOpacity" style={labelStyling}>
-                Fill Opacity (Default Value):
+                Fill Opacity:
               </label>
               <input
                 type="number"
@@ -635,7 +660,7 @@ export default function LayerForm(props: LayerFormProps) {
           </>
         )}
 
-        {selectedType === "symbol" && (
+        {formik.values.type === "symbol" && (
           <>
             <div style={{ marginBottom: "15px" }}>
               <label htmlFor="textColor" style={labelStyling}>
@@ -653,7 +678,7 @@ export default function LayerForm(props: LayerFormProps) {
             {/* Default Text Size */}
             <div style={{ marginBottom: "15px" }}>
               <label htmlFor="textSizeDefault" style={labelStyling}>
-                Default Text Size:
+                Text Size:
               </label>
               <input
                 type="number"
@@ -703,7 +728,7 @@ export default function LayerForm(props: LayerFormProps) {
                 id="iconImage"
                 name="iconImage"
                 onChange={formik.handleChange}
-                value={formik.values.iconImage}
+                // value={formik.values.iconImage}
                 style={boxStyling}
               >
                 <option value="">Select Icon</option>
@@ -712,7 +737,7 @@ export default function LayerForm(props: LayerFormProps) {
                 <option value="another-icon">Another Icon</option>
                 {/* Add more predefined icons as needed */}
               </select>
-            </div>
+            </div>{" "}
             <div style={{ marginBottom: "15px" }}>
               <label htmlFor="customIconImage" style={labelStyling}>
                 Or Custom Icon URL:
@@ -740,7 +765,6 @@ export default function LayerForm(props: LayerFormProps) {
                 style={checkboxStyling}
               />
             </div>
-
             {/* Text Size Stops */}
             {formik.values.useTextSizeZoomStyling && (
               <FieldArray
@@ -799,7 +823,6 @@ export default function LayerForm(props: LayerFormProps) {
                 )}
               />
             )}
-
             {/* Use Zoom Styling for Icon Size
             <div style={{ marginBottom: "15px" }}>
               <label style={labelStyling}>
@@ -814,7 +837,6 @@ export default function LayerForm(props: LayerFormProps) {
                 style={checkboxStyling}
               />
             </div> */}
-
             {/* Default Icon Size
             <div style={{ marginBottom: "15px" }}>
               <label htmlFor="iconSizeDefault" style={labelStyling}>
@@ -831,7 +853,6 @@ export default function LayerForm(props: LayerFormProps) {
                 style={boxStyling}
               />
             </div> */}
-
             {/* Icon Size Stops */}
             {formik.values.useIconSizeZoomStyling && (
               <FieldArray
@@ -884,11 +905,11 @@ export default function LayerForm(props: LayerFormProps) {
           </>
         )}
 
-        {selectedType === "circle" && (
+        {formik.values.type === "circle" && (
           <>
             <div style={{ marginBottom: "15px" }}>
               <label htmlFor="circleRadius" style={labelStyling}>
-                Circle Radius (Default):
+                Circle Radius:
               </label>
               <input
                 type="number"
@@ -915,7 +936,7 @@ export default function LayerForm(props: LayerFormProps) {
             </div>
             <div style={{ marginBottom: "15px" }}>
               <label htmlFor="circleOpacity" style={labelStyling}>
-                Circle Opacity (Default):
+                Circle Opacity:
               </label>
               <input
                 type="number"
@@ -1125,7 +1146,7 @@ export default function LayerForm(props: LayerFormProps) {
           </>
         )}
 
-        {selectedType === "line" && (
+        {formik.values.type === "line" && (
           <>
             <div style={{ marginBottom: "15px" }}>
               <label htmlFor="lineColor" style={labelStyling}>
@@ -1332,15 +1353,15 @@ export default function LayerForm(props: LayerFormProps) {
           <label htmlFor="iconColor" style={labelStyling}>
             Icon Color:
           </label>
-          <div id="sourceLayer">
-            <ColorPickerButton
-              callback={(newColor: string) => {
-                formik.setValues({
-                  ...formik.values,
-                  iconColor: newColor,
-                });
-              }}
-            ></ColorPickerButton>
+          <div id="iconColor">
+            <input
+              type="color"
+              id="iconColor"
+              name="iconColor"
+              onChange={formik.handleChange}
+              value={formik.values.iconColor}
+              style={{ ...boxStyling, padding: "5px" }}
+              />
           </div>
 
           <label htmlFor="iconType" style={labelStyling}>
@@ -1607,18 +1628,6 @@ export default function LayerForm(props: LayerFormProps) {
             style={checkboxStyling}
           />
         </div>
-
-        {/* <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="paint" style={labelStyling}>Paint:</label>
-          <input
-            type="text"
-            id="paint"
-            name="paint"
-            onChange={formik.handleChange}
-            value={formik.values.paint}
-            style={boxStyling}
-          />
-        </div> */}
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
           {props.layerConfig ? (
             <>

@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { setCookie } from "cookies-next";
+import bcrypt from "bcryptjs";
 
 // Login
 export async function POST(request: Request) {
@@ -30,8 +30,8 @@ export async function POST(request: Request) {
                 { status: 401 }
             );
         }
-
-        const isMatch = user.password === exsituser.password;
+        
+        const isMatch = await bcrypt.compare(user.password, exsituser.password);
 
         if (!isMatch) {
             return NextResponse.json(
